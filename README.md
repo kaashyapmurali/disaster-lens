@@ -31,20 +31,30 @@ outline with a damage class; its train and test splits, used here, cover ten dis
 
 ## 3. The model
 
-<p align="center"><img src="assets/architecture.jpg" width="100%" alt="Vertical pipeline: pre and post images; Mask R-CNN on the pre image finds footprints; a shared DINOv3 ViT-L encodes both images; per footprint, pooled features and their pre-to-post change go through a small classifier to one of four damage classes."></p>
+<p align="center"><img src="assets/architecture.jpg" width="100%" alt="Two stages. A: Mask R-CNN on the pre-event image finds building footprints (or known footprints are used). B: when the post-disaster image arrives, one DINOv3 ViT-L encodes both dates; per-date patch embeddings and scene contexts are pooled per footprint and a small head classifies damage."></p>
 
-- **Find buildings.** Mask R-CNN (ResNet-50-FPN, COCO-pretrained) outlines buildings on the *pre-event* image, where
-  they are still intact. Two thirds of all buildings cover less than 32 × 32 px, so the detector is trained and run
-  on 512 px tiles enlarged 2×; that raised mask AP from 0.343 to 0.405 and small-building recall from 44% to 58%
-  (validation).
-- **Encode both dates.** One satellite-pretrained DINOv3 ViT-L/16 encodes the before and after images with the same
-  weights; its last 4 of 24 blocks are fine-tuned for damage.
-- **Compare each building.** For every footprint, a 3 × 3 feature grid is pooled on both dates, plus a whole-scene
-  average. A small head classifies **[post building, post scene, post − pre building, post − pre scene]**.
+Two stages, run at different times:
 
-Also explored, in order (test macro-F1 with known footprints): post-image-only ResNet-18 **0.669** → paired ResNet-18
-**0.724** → frozen ViT **0.783** → fine-tuned ViT **0.802**. Comparing before with after, a satellite-pretrained
-encoder, and fine-tuning it each helped.
+**A · Building identification (pre-event image).** Mask R-CNN with a ResNet-50-FPN backbone, starting from COCO
+weights: ResNet-50 → feature pyramid → region proposals → RoIAlign → box head (building vs. background) and mask head
+(28 × 28 mask per building). The ResNet stem and first stage stay frozen; stages 2–4, the pyramid, the proposal network
+and both heads are fine-tuned on xBD footprints, with new two-class predictors. Two thirds of all buildings cover less
+than 32 × 32 px, so the detector is trained and run on 512 px tiles enlarged 2×; that raised mask AP from 0.343 to
+0.405 and small-building recall from 44% to 58% (validation). With an existing building map, this stage is skipped.
+
+**B · Damage assessment (when the post-disaster image arrives).**
+- **Encode both dates** with one DINOv3 ViT-L/16, pretrained on satellite imagery (SAT-493M): 16 × 16 px patches →
+  24 transformer blocks (1024-d, 16 heads, rotary positions) → a 64 × 64 grid of 1024-d patch embeddings per date.
+  Blocks 1–20 stay frozen; blocks 21–24 and the final norm (50M of 303M parameters) are fine-tuned.
+- **Keep the context of each date:** the mean of all patch embeddings, for the pre- and the post-event image.
+- **Collect features per footprint:** RoIAlign pools a 3 × 3 grid of patch embeddings inside each footprint, on both
+  dates.
+- **Compare and classify:** shared projections to 128-d, then a small MLP (trained for this task) on
+  **[post building, post context, post − pre building, post − pre context]** → no damage / minor / major / destroyed.
+
+Damage models tried, in order (test macro-F1 with known footprints): post-image-only ResNet-18 **0.669** → paired
+ResNet-18 **0.724** → frozen ViT **0.783** → fine-tuned ViT **0.802**. Comparing before with after, a
+satellite-pretrained encoder, and fine-tuning it each helped.
 
 ## 4. Results
 
@@ -72,15 +82,31 @@ encoder, and fine-tuning it each helped.
 
 These are probes and associations, not a complete explanation of the network.
 
-## 6. Limitations and next steps
+## 6. Next steps: from benchmark to deployment
 
-- **Seen disasters only.** Train, validation and test come from the same ten events; performance on a new disaster
-  is unmeasured. Next: hold out whole events.
-- **Detection.** Most lost buildings already have a correct outline with a low confidence score (78% of misses). A
-  pilot verifier that re-scores detections with ViT features raised end-to-end validation macro-F1 from 0.566 to
-  0.583; next is splitting merged buildings in dense blocks and trying a ViT-based detector.
-- **Subtle damage.** Minor vs. no damage remains the main confusion; pooling features over the building mask instead of
-  its box is a cheap next step.
+<p align="center"><img src="assets/next-steps.jpg" width="100%" alt="Deployment workflow: post-disaster image with metadata, search a region of a reference archive, match keypoints with RANSAC, gate on match quality, then assess damage on aligned reference footprints, or fall back to detection. A real SIFT match on the test wildfire pair."></p>
+
+**Registration is the first problem in the field.** With known footprints the model scores 0.802; detecting buildings
+from the images alone gives 0.574. In xBD the before and after images arrive co-registered with their footprints (the
+measured residual is a few pixels, and correcting it did not improve the score), so the gap there is detection. A real
+deployment gets a post-disaster image with a GPS fix and camera metadata, not aligned to anything. The workflow:
+
+1. Use the metadata to bound a search region in an archive of pre-event imagery and building footprints.
+2. Match local keypoints between the post-disaster image and candidate reference tiles (classic SIFT/ORB, or learned
+   matchers such as SuperPoint + LightGlue), and fit the alignment with RANSAC.
+3. If enough matches are consistent, warp the reference footprints onto the new image and run the damage model on
+   them: the 0.802 path. If not, fall back to detecting buildings and flag the area for review.
+
+On the wildfire pair above, SIFT finds 123 descriptor matches, 68 consistent after RANSAC: all on intact roads and
+houses, almost none in the burned area. The damage itself is what makes registration hard.
+
+Also next:
+- **Misalignment tolerance:** shift footprints synthetically to measure how much registration error the damage model
+  tolerates.
+- **New disasters:** all results come from ten events seen in training; hold out whole events.
+- **Detection:** 78% of missed buildings already have a correct outline with a low score; a pilot that re-scores
+  detections raised end-to-end validation macro-F1 from 0.566 to 0.583.
+- **Subtle damage:** minor vs. no damage is the main confusion; pool features over the building mask, not its box.
 - One training run per model; labels describe what is visible from above, not structural safety.
 
 ## Repository layout
