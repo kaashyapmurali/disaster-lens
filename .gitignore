@@ -1,0 +1,47 @@
+# Local datasets: never commit source imagery or annotations
+/datasets/
+
+# Generated artifacts
+/artifacts/
+/checkpoints/
+/outputs/
+/runs/
+/wandb/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Python environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Local-only analyses, report drafts and reproduction scripts
+/local/
+/docs/
+/scripts/
+
+# Local notebooks and state
+/notebooks/
+.ipynb_checkpoints/
+
+# Credentials, private notes and local configuration
+AGENTS.md
+EXPERIMENTS.md
+.modal.toml
+.env
+.env.*
+!.env.example
+/secrets/
+
+# macOS
+.DS_Store

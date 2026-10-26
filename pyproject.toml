@@ -1,0 +1,39 @@
+[project]
+name = "disaster-lens"
+version = "0.1.0"
+description = "Building damage assessment from pre- and post-disaster satellite imagery using xBD."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "LICENSES/*"]
+authors = [
+    { name = "Kaashyap Murali", email = "kaashyapmurali@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "filelock>=4.2.0",
+    "numpy>=2.5.4",
+    "pillow>=12.3.0",
+    "scikit-learn>=1.9.1",
+    "shapely>=2.2.0",
+    "torch>=2.14.1",
+    "torchvision>=0.29.1",
+]
+
+[project.scripts]
+disaster-lens = "disaster_lens:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+cloud = [
+    "modal>=1.6.2",
+]
+notebook = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+]
+vit = [
+    "timm>=1.0.20",
+]
