@@ -1,0 +1,62 @@
+{
+ "no-damage": {
+  "n": 41427,
+  "real": {
+   "no-damage": 40298,
+   "minor-damage": 705,
+   "major-damage": 242,
+   "destroyed": 182
+  },
+  "no_change": {
+   "no-damage": 41418,
+   "minor-damage": 1,
+   "major-damage": 0,
+   "destroyed": 8
+  }
+ },
+ "minor-damage": {
+  "n": 4798,
+  "real": {
+   "no-damage": 1325,
+   "minor-damage": 2945,
+   "major-damage": 376,
+   "destroyed": 152
+  },
+  "no_change": {
+   "no-damage": 4777,
+   "minor-damage": 2,
+   "major-damage": 18,
+   "destroyed": 1
+  }
+ },
+ "major-damage": {
+  "n": 3850,
+  "real": {
+   "no-damage": 426,
+   "minor-damage": 367,
+   "major-damage": 2799,
+   "destroyed": 258
+  },
+  "no_change": {
+   "no-damage": 3840,
+   "minor-damage": 8,
+   "major-damage": 2,
+   "destroyed": 0
+  }
+ },
+ "destroyed": {
+  "n": 3775,
+  "real": {
+   "no-damage": 246,
+   "minor-damage": 69,
+   "major-damage": 286,
+   "destroyed": 3174
+  },
+  "no_change": {
+   "no-damage": 3727,
+   "minor-damage": 28,
+   "major-damage": 20,
+   "destroyed": 0
+  }
+ }
+}

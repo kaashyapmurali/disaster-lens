@@ -1,0 +1,25 @@
+/* Shared look for the README figures (rendered from report/bundle by report/figures/render.mjs). */
+:root{--ink:#132b3b;--muted:#5a6c78;--faint:#8b9aa3;--paper:#f6f7f3;--card:#ffffff;--card-2:#fbfcfa;--line:#dfe5e3;
+  --accent:#007c70;--accent-viz:#007c70;--accent-soft:#e3f1ec;--strong:#102c36;--strong-2:#1b3d48;--strong-ink:#edf4ef;--strong-muted:#b5c7c8;--strong-label:#a9d3b6;
+  --detector:#1789b5;--wire:#41646e;--arrow:#97a8ae;--neutral:#9aa8ae;--grid:#e6ebe8;--track:#eef1ee;
+  --frozen-a:#eef1ef;--frozen-b:#e5e9e7;--frozen-line:#d3dad7;--tuned-bg:#dff1ea;--tuned-line:#3e9e86;--tuned-soft:#eef6f2;--new-bg:#fff1d6;--new-line:#e2a23b;
+  --gate-bg:#fffaf0;--gate-num:#d08a14;--ok-bg:#e3f1ec;--ok-line:#9cc9b8;--ok-ink:#174f45;--no-bg:#f3f1ec;--no-line:#b8b1a3;--no-ink:#5e574a;
+  --good:#1f8f47;--warn:#c8521a;--chip-ink:#0d2229;--p1:#cfe3d6;--p2:#e4eedb;--p3:#f2d3dc;--p4:#f6e5ea;--v1:#a9d3b6;--v2:#d6e8c5;--v3:#ffcf8a;--v4:#ffe2b8;
+  --nd:#2fae58;--minor:#d9a900;--major:#ee7a16;--destroyed:#df2f42;
+  --nd-b:#3ccf6e;--minor-b:#ffd23f;--major-b:#ff8a2a;--destroyed-b:#ff3b4e;--cyan:#35d0ff;
+  --body-font:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--head-font:var(--body-font);--head-weight:650;
+  font-family:var(--body-font);color:var(--ink);font-synthesis:none;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+body{margin:0;background:transparent;padding:24px}
+.fig{width:var(--w,1100px);background:var(--paper);border-radius:18px;padding:34px 38px 30px;border:1px solid var(--line)}
+.eyebrow{font:650 11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
+
+h1{font-family:var(--head-font);font-size:27px;line-height:1.2;letter-spacing:-.7px;font-weight:var(--head-weight);margin:8px 0 6px}
+h1 .soft{color:var(--muted);font-weight:inherit}
+.lede{font-size:14.5px;line-height:1.6;color:var(--muted);margin:0 0 22px;max-width:900px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.tile{display:block;border-radius:9px;width:100%;height:auto}
+.note{font-size:11.5px;line-height:1.55;color:var(--faint);margin-top:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.chip i{width:11px;height:11px;border-radius:3px;background:var(--c)}
+.legend{display:flex;gap:16px;flex-wrap:wrap}

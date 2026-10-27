@@ -39,18 +39,23 @@ Two stages, run at different times.
 **A. Building identification (pre-event image).** Mask R-CNN with a ResNet-50-FPN backbone, starting from COCO
 weights: ResNet-50 → feature pyramid → region proposals → RoIAlign → box head (building vs. background) and mask head
 (28 × 28 mask per building). The ResNet stem and first stage stay frozen; stages 2–4, the pyramid, the proposal network
-and both heads are fine-tuned on xBD footprints, with new two-class predictors. Two thirds of all buildings cover less
-than 32 × 32 px, so the detector is trained and run on 512 px tiles enlarged 2×; on validation this raised mask AP
-from 0.343 to 0.405 and small-building recall from 44% to 58%. With an existing building map, this stage is skipped.
+and both heads are fine-tuned on xBD footprints, with new two-class predictors. The training loss is the standard Mask
+R-CNN sum, with equal weights: proposal objectness (binary cross-entropy) and box offsets (smooth L1), building vs.
+background (cross-entropy) and box refinement (smooth L1), and the per-pixel mask loss (binary cross-entropy). Two
+thirds of all buildings cover less than 32 × 32 px, so the detector is trained and run on 512 px tiles enlarged 2×; on
+validation this raised mask AP from 0.343 to 0.405 and small-building recall from 44% to 58%. With an existing
+building map, this stage is skipped.
 
 **B. Damage assessment (when the post-disaster image arrives).**
 - Both dates are encoded by one DINOv3 ViT-L/16, pretrained on satellite imagery (SAT-493M): 16 × 16 px patches →
   24 transformer blocks (1024-d, 16 heads, rotary positions) → a 64 × 64 grid of 1024-d patch embeddings per date.
   Blocks 1–20 stay frozen; blocks 21–24 and the final norm (50M of 303M parameters) are fine-tuned.
 - A scene context is kept per date: the mean of all patch embeddings of the pre- and of the post-event image.
-- For each footprint, RoIAlign pools a 3 × 3 grid of patch embeddings on both dates.
-- Shared projections to 128-d, then a small MLP (trained for this task) classifies
-  **[post building, post context, post − pre building, post − pre context]**.
+- For each footprint, RoIAlign pools a 3 × 3 grid of patch embeddings on both dates. With the two scene contexts, each
+  building has four raw vectors: pre building, post building, pre context, post context.
+- Each is projected to 128-d, and a small MLP (512 → 128 → 4) classifies
+  **[post building, post context, Δ building, Δ context]**, where Δ = post − pre. The pre-event features enter only
+  through the two Δ terms. The loss is cross-entropy over the four damage classes, unweighted.
 
 Damage models tried, with known footprints on the test split:
 
@@ -81,11 +86,14 @@ were selected on validation macro-F1 (the mean of the per-class F1 scores).
 
 ## 5. Sensitivity analysis
 
-<p align="center"><img src="assets/change.jpg" width="100%" alt="Probe 1: with the pre-event image given twice, predicted damage nearly disappears. Probe 2: encoder feature change between dates on the wildfire scene. Panel 3: predicted severity against simple image-change statistics by disaster."></p>
+<p align="center"><img src="assets/change.jpg" width="100%" alt="Panel 1: with the pre-event image given twice, predicted damage nearly disappears. Panel 2: predicted severity against simple image-change statistics by disaster. Panel 3: Δ features, the change in encoder features between dates on the wildfire scene."></p>
 
 - With the pre-event image given as both dates, the share of buildings predicted as damaged drops from 93.5% to 1.3%
   for destroyed, 88.9% to 0.3% for major and 72.4% to 0.4% for minor. The predictions depend on the post-event image,
   not on the pre-event appearance of the area.
+- Δ features, the per-patch change in the encoder's features between the two dates (1 − cosine similarity), is large
+  over the burned houses and hillside of the wildfire scene and small over the intact houses at its edges. The
+  classifier's Δ inputs (post − pre) carry the same kind of signal for each building.
 - For wildfires, predicted severity increases with colour and edge change inside the footprint and with lost
   vegetation around it, in line with the labels. Flood and earthquake damage changes few roof pixels, and predicted
   severity barely moves with these measures there.
@@ -97,7 +105,8 @@ These are input probes and associations, not a complete explanation of the netwo
 <p align="center"><img src="assets/next-steps.jpg" width="100%" alt="Deployment pipeline with alignment to a pre-event reference as the first step; two approaches depending on available metadata; matching restricted to roads; a SIFT example on the test wildfire pair."></p>
 
 **Alignment is the first step of a deployment pipeline and the main open problem.** The damage model needs building
-footprints that line up with the post-disaster image. In xBD, image pairs arrive aligned with their footprints. A real
+footprints that line up with the post-disaster image. In xBD, image pairs arrive aligned with their footprints; the
+dataset authors corrected post-event offsets per event. A real
 post-disaster image arrives with location metadata only, so it first has to be aligned to a pre-event reference with
 building footprints; then the reference footprints are transferred and the damage model runs on them. If no reliable
 alignment is found, the detector is the fallback, at the lower recall shown above.
@@ -137,7 +146,8 @@ src/disaster_lens/
                candidate re-scoring (verifier pilot)
   end_to_end/  damage predictions on detected and annotated footprints, scoring, no-change probe
 modal_app.py   runs any stage on a Modal L4 GPU
-assets/        README figures
+report/        report pipeline: scripts, figure templates and the generated bundle (numbers + imagery)
+assets/        README figures, rendered from report/bundle
 tests/         CPU unit and workflow tests on synthetic data
 ```
 
@@ -243,6 +253,14 @@ python -m disaster_lens.detection.train export --run-dir runs/detector-2x --spli
 python -m disaster_lens.end_to_end.run --checkpoint runs/fine-tuned-vit/best.pt --skip-reference-check \
     --manifest datasets/processed/test_buildings.csv --data-dir datasets \
     --export-dir runs/detector-2x/test_predictions_tile512 --output-dir runs/end-to-end-test --device cuda
+```
+
+**Report figures.** The README figures and the website report are built from one committed bundle,
+`report/bundle/`; see [report/README.md](report/README.md):
+
+```bash
+uv run --group notebook python report/scripts/build.py      # numbers, scenes, site data, manifest
+node report/figures/render.mjs                              # README figures in assets/ (local Chrome)
 ```
 
 ## Tests

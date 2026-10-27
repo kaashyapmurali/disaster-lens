@@ -1,0 +1,159 @@
+{
+ "damage_models": [
+  {
+   "label": "Post-only ResNet-18",
+   "validation_macro_f1": 0.6621536423054137,
+   "per_class": {
+    "no-damage": {
+     "precision": 0.9436695018226002,
+     "recall": 0.8262479254436359,
+     "f1": 0.8810636656532196,
+     "support": 23499
+    },
+    "minor-damage": {
+     "precision": 0.3443255569198386,
+     "recall": 0.6556446225784903,
+     "f1": 0.4515238642898217,
+     "support": 2994
+    },
+    "major-damage": {
+     "precision": 0.5212702216896345,
+     "recall": 0.6318082788671024,
+     "f1": 0.5712409717662508,
+     "support": 2754
+    },
+    "destroyed": {
+     "precision": 0.8085901027077498,
+     "recall": 0.6903148664806696,
+     "f1": 0.744786067512363,
+     "support": 2509
+    }
+   }
+  },
+  {
+   "label": "Paired ResNet-18",
+   "validation_macro_f1": 0.695120035719909,
+   "per_class": {
+    "no-damage": {
+     "precision": 0.9036510345929536,
+     "recall": 0.9626792629473595,
+     "f1": 0.9322316774153668,
+     "support": 23499
+    },
+    "minor-damage": {
+     "precision": 0.5358342665173572,
+     "recall": 0.3196392785571142,
+     "f1": 0.400418410041841,
+     "support": 2994
+    },
+    "major-damage": {
+     "precision": 0.6708074534161491,
+     "recall": 0.6666666666666666,
+     "f1": 0.6687306501547987,
+     "support": 2754
+    },
+    "destroyed": {
+     "precision": 0.8340154615734425,
+     "recall": 0.730968513351933,
+     "f1": 0.7790994052676296,
+     "support": 2509
+    }
+   }
+  },
+  {
+   "label": "Frozen DINOv3 ViT-L",
+   "validation_macro_f1": 0.7747987004151886,
+   "per_class": {
+    "no-damage": {
+     "precision": 0.9400074524903739,
+     "recall": 0.9661687731392825,
+     "f1": 0.9529085872576177,
+     "support": 23499
+    },
+    "minor-damage": {
+     "precision": 0.6274593669803251,
+     "recall": 0.48997995991983967,
+     "f1": 0.5502625656414104,
+     "support": 2994
+    },
+    "major-damage": {
+     "precision": 0.7235169491525424,
+     "recall": 0.7440087145969498,
+     "f1": 0.7336197636949516,
+     "support": 2754
+    },
+    "destroyed": {
+     "precision": 0.8758734073160707,
+     "recall": 0.8493423674770825,
+     "f1": 0.8624038850667746,
+     "support": 2509
+    }
+   }
+  },
+  {
+   "label": "Fine-tuned DINOv3 ViT-L",
+   "validation_macro_f1": 0.7957779319879071,
+   "per_class": {
+    "no-damage": {
+     "precision": 0.9458659776629438,
+     "recall": 0.9658708881228989,
+     "f1": 0.9557637646068007,
+     "support": 23499
+    },
+    "minor-damage": {
+     "precision": 0.6497175141242938,
+     "recall": 0.5761523046092184,
+     "f1": 0.6107275624004248,
+     "support": 2994
+    },
+    "major-damage": {
+     "precision": 0.7643527204502815,
+     "recall": 0.7396514161220044,
+     "f1": 0.7517992249492527,
+     "support": 2754
+    },
+    "destroyed": {
+     "precision": 0.8770491803278688,
+     "recall": 0.8529294539657234,
+     "f1": 0.8648211759951505,
+     "support": 2509
+    }
+   }
+  }
+ ],
+ "detectors": [
+  {
+   "label": "Native scale, whole scenes",
+   "ap": 0.3427225342443819,
+   "ap50": 0.6754244610646055,
+   "recall": 0.5652039459442744,
+   "precision": 0.7970780636720454,
+   "small": 0.43989071038251365,
+   "unmatched": 4653,
+   "buildings": 32337,
+   "scenes": 443
+  },
+  {
+   "label": "2\u00d7 crops and tiles (selected)",
+   "ap": 0.40545516697633693,
+   "ap50": 0.7285389687296359,
+   "recall": 0.682036057766645,
+   "precision": 0.7014279807906371,
+   "small": 0.5785754663651781,
+   "unmatched": 9388,
+   "buildings": 32337,
+   "scenes": 443
+  }
+ ],
+ "test_detector": {
+  "label": "2\u00d7 crops and tiles, test split",
+  "ap": 0.40645098192099527,
+  "ap50": 0.7309667819568134,
+  "recall": 0.6772994057817797,
+  "precision": 0.7025790349417638,
+  "small": 0.5725839171242325,
+  "unmatched": 15730,
+  "buildings": 54862,
+  "scenes": 933
+ }
+}

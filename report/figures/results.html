@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Results</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+.fig{--w:1100px}
+.section{font:650 10.5px ui-monospace,monospace;letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
+.flowcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px 22px 14px}
+svg text{font-family:var(--body-font)}
+.lower{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin-top:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px 22px}
+.panel h3{font-size:16px;margin:0 0 4px;letter-spacing:-.2px}.panel .sub{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.cm{display:grid;grid-template-columns:86px repeat(4,1fr);gap:4px;font-size:11.5px}
+.cm .h{font:600 10px ui-monospace,monospace;color:var(--muted);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;text-align:center}
+.cm .r{font-size:12px;color:var(--ink);display:flex;align-items:center;font-weight:550}
+.cm .c{height:52px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:650;font-size:14px}
+.cm .c small{font-weight:450;font-size:10px;opacity:.75}
+.axis{font:600 10px ui-monospace,monospace;color:var(--faint);letter-spacing:1px;margin:2px 0 6px 90px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv div{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kv b{display:block;font-size:26px;letter-spacing:-.8px;font-weight:600}
+.kv span{font-size:12px;color:var(--muted);line-height:1.4;display:block;margin-top:2px}
+</style></head>
+<body>
+<div class="fig" id="figure">
+  <div class="eyebrow">Results · xBD test split</div>
+  <h1>Where test buildings are lost, and which classes are confused</h1>
+  <p class="lede">Left to right: all labeled test buildings, whether the detector found them, and whether found buildings received their reference class. Below: the class confusion with known footprints, and detector metrics.</p>
+  <div id="body">
+  <div class="section">53,850 labeled test buildings · detected footprints</div>
+  <div class="flowcard"><svg id="flow" width="1012" height="400" viewBox="0 0 1012 400"></svg></div>
+  <div class="lower">
+    <div class="panel">
+      <h3>Confusion with known footprints</h3>
+      <p class="sub">Share of each reference class (rows) predicted as each class (columns).</p>
+      <div class="axis">PREDICTED →</div>
+      <div class="cm" id="cm"></div>
+    </div>
+    <div class="panel">
+      <h3>Building detector</h3>
+      <p class="sub">Mask R-CNN on all 54,862 test footprints (including the few without a damage label).</p>
+      <div class="kv" id="kv"></div>
+    </div>
+  </div>
+  </div>
+  <div class="note">Fine-tuned DINOv3 ViT-L damage model with the 2× Mask R-CNN detector at score ≥ 0.5. A building counts as found when a detection's mask overlaps its annotated footprint with IoU ≥ 0.5. Some extra detections are real buildings that are missing from the labels.</div>
+</div>
+<script src="site.js"></script>
+<script>
+const D = window.DATA, F = D.flow, T = D.detector.test;
+const L = ["no-damage","minor-damage","major-damage","destroyed"], N = {"no-damage":"No damage","minor-damage":"Minor","major-damage":"Major","destroyed":"Destroyed"};
+const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = {"no-damage":cv("--nd"),"minor-damage":cv("--minor"),"major-damage":cv("--major"),"destroyed":cv("--destroyed")};
+const INK = cv("--ink"), MUTED = cv("--muted"), ACC = cv("--accent-viz"), NEU = cv("--neutral");
+const fmt = n => n.toLocaleString('en-US'), pct = (a, b, d = 0) => (100 * a / b).toFixed(d) + '%';
+// Flow diagram.
+const svg = document.getElementById('flow'), H = 250, top0 = 26, total = F.labeled;
+const k = H / (total + F.extra * 0);           // px per building for the main column
+const x0 = 20, x1 = 330, x2 = 640, w = 16;
+function node(x, y, h, color, label, sub, anchor = 'start', dx = 24) {
+  svg.insertAdjacentHTML('beforeend', `<rect x="${x}" y="${y}" width="${w}" height="${Math.max(h, 2)}" rx="3" fill="${color}"/>` +
+    `<text x="${x + (anchor === 'start' ? dx : -8)}" y="${y + Math.max(h, 2) / 2 - 3}" font-size="14" font-weight="650" fill="${INK}" text-anchor="${anchor}">${label}</text>` +
+    `<text x="${x + (anchor === 'start' ? dx : -8)}" y="${y + Math.max(h, 2) / 2 + 14}" font-size="12" fill="${MUTED}" text-anchor="${anchor}">${sub}</text>`);
+}
+function ribbon(xa, ya, xb, yb, h, color, opacity = .28) {
+  const xm = (xa + w + xb) / 2;
+  svg.insertAdjacentHTML('afterbegin', `<path d="M${xa + w},${ya} C${xm},${ya} ${xm},${yb} ${xb},${yb} L${xb},${yb + h} C${xm},${yb + h} ${xm},${ya + h} ${xa + w},${ya + h} Z" fill="${color}" opacity="${opacity}"/>`);
+}
+const hFound = F.found * k, hMissed = F.missed * k, gap = 26;
+node(x0, top0, H, INK, fmt(total), 'labeled buildings', 'start', 24);
+const yFound = top0, yMissed = top0 + hFound + gap;
+ribbon(x0, top0, x1, yFound, hFound, ACC);
+ribbon(x0, top0 + hFound, x1, yMissed, hMissed, NEU);
+node(x1, yFound, hFound, ACC, `Found · ${fmt(F.found)}`, `${pct(F.found, total)} of labeled buildings`);
+node(x1, yMissed, hMissed, NEU, `Missed · ${fmt(F.missed)}`, `${pct(F.missed, total)} · ${pct(F.missed_by_class['no-damage'], F.missed)} of them undamaged`);
+const out = [["correct", "Exact damage class", cv("--nd")], ["adjacent", "One class off", cv("--minor")], ["far", "Two or more classes off", cv("--destroyed")]];
+let y = yFound, yIn = yFound;
+const gap2 = 14;
+for (const [key, label, color] of out) {
+  const n = F.found_outcome[key], h = n * k;
+  ribbon(x1, yIn, x2, y, h, color, .3);
+  node(x2, y, h, color, `${label} · ${fmt(n)}`, `${pct(n, F.found, 1)} of found buildings`);
+  yIn += h; y += h + gap2 + (h < 20 ? 22 : 0);
+}
+// Extra detections, drawn to the same scale.
+const hx = F.extra * k, yx = Math.max(y + 22, yMissed + hMissed + 18);
+svg.insertAdjacentHTML('beforeend', `<rect x="${x2}" y="${yx}" width="${w}" height="${hx}" rx="3" fill="none" stroke="${NEU}" stroke-width="1.6" stroke-dasharray="4 3"/>` +
+  `<text x="${x2 + 24}" y="${yx + hx / 2 - 3}" font-size="14" font-weight="650" fill="${INK}">Extra detections · ${fmt(F.extra)}</text>` +
+  `<text x="${x2 + 24}" y="${yx + hx / 2 + 14}" font-size="12" fill="${MUTED}">no labeled building there (same scale)</text>`);
+// Confusion grid (known footprints), row-normalized.
+const cm = F.footprints_confusion;
+let html = '<div></div>' + L.map(l => `<div class="h">${N[l]}</div>`).join('');
+cm.forEach((row, i) => {
+  const s = row.reduce((a, b) => a + b, 0);
+  html += `<div class="r">${N[L[i]]}</div>` + row.map((v, j) => {
+    const share = v / s, base = i === j ? ACC : cv("--destroyed");
+    const a = i === j ? .15 + .8 * share : Math.min(.9, .12 + 2.2 * share);
+    const ink = (i === j && share > .5) ? cv("--paper") : INK;
+    return `<div class="c" style="background:color-mix(in srgb, ${base} ${Math.round(100 * (share < .005 ? .04 : a))}%, transparent);color:${ink}">${(100 * share).toFixed(share < .1 ? 1 : 0)}%<small>${fmt(v)}</small></div>`;
+  }).join('');
+});
+document.getElementById('cm').innerHTML = html;
+document.getElementById('kv').innerHTML = `
+ <div><b>${T.ap.toFixed(3)}</b><span>mask AP, IoU 0.50–0.95</span></div>
+ <div><b>${pct(T.recall, 1)}</b><span>buildings found at score ≥ 0.5</span></div>
+ <div><b>${T.precision.toFixed(2)}</b><span>precision at score ≥ 0.5</span></div>
+ <div><b>${pct(T.small, 1)}</b><span>small buildings found (&lt; 32 × 32 px)</span></div>`;
+</script>
+</body></html>

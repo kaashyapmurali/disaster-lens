@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Examples</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+.fig{--w:1100px}
+.head{display:grid;grid-template-columns:190px repeat(4,1fr);gap:10px;margin-bottom:8px}
+.head div{font:650 10px ui-monospace,monospace;letter-spacing:1.3px;color:var(--muted);text-align:center}
+.row{display:grid;grid-template-columns:190px repeat(4,1fr);gap:10px;align-items:center;margin-bottom:12px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px}
+.row img{aspect-ratio:1;object-fit:cover;border-radius:7px}
+.meta h3{font-size:16px;margin:0 0 3px;letter-spacing:-.2px}.meta p{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.45}
+.meta .n{display:grid;gap:4px;font-size:12px}.meta .n b{font-size:15px}
+.ok{color:var(--good)}.warn{color:var(--warn)}
+</style></head>
+<body>
+<div class="fig" id="figure">
+  <div class="eyebrow">Examples · xBD test split</div>
+  <h1>Test examples: prediction and reference</h1>
+  <p class="lede">Predicted: damage class on each detected footprint. Reference: the annotated footprints and their labels. Tiles chosen by a fixed rule: per disaster type, the test scene with the most damaged buildings, cropped to its densest window.</p>
+  <div id="body">
+  <div class="head"><div></div><div>BEFORE</div><div>AFTER</div><div>PREDICTED</div><div>REFERENCE</div></div>
+  <div id="rows"></div>
+  <div class="legend" style="margin-top:6px"><span class="chip"><i style="--c:#3ccf6e"></i>No damage</span><span class="chip"><i style="--c:#ffd23f"></i>Minor</span><span class="chip"><i style="--c:#ff8a2a"></i>Major</span><span class="chip"><i style="--c:#ff3b4e"></i>Destroyed</span></div>
+  </div>
+  <div class="note">Counts are for the shown crop: “found” = rated reference buildings matched by a detection (mask IoU ≥ 0.5, score ≥ 0.5); “correct” = found buildings given their reference class. Imagery: xBD dataset (xView2 challenge), CC BY-NC-SA 4.0.</div>
+</div>
+<script src="site.js"></script>
+<script>
+const D = window.DATA;
+const say = {
+  fire: "Burned-out blocks: every found house rated destroyed, as in the labels.",
+  flooding: "Flooded streets: buildings rated major damage, as in the labels.",
+  wind: "Dense small buildings: many missed by the detector; found ones mostly right.",
+  tsunami: "Debris field: destroyed buildings found and rated; some merged or missed.",
+  earthquake: "Dense city blocks: most buildings missed, and subtle damage rated as none.",
+};
+document.getElementById('rows').innerHTML = ["fire", "flooding", "wind", "tsunami", "earthquake"].map(t => {
+  const e = D.examples[t], rated = e.matched + e.missed, foundShare = e.matched / rated, okShare = e.correct / Math.max(e.matched, 1);
+  return `<div class="row"><div class="meta"><h3>${e.title}</h3><p>${say[t]}</p><div class="n">
+      <span><b class="${foundShare > .8 ? 'ok' : 'warn'}">${e.matched} / ${rated}</b> rated buildings found</span>
+      <span><b class="${okShare > .8 ? 'ok' : 'warn'}">${e.correct} / ${e.matched}</b> found ones correct</span></div></div>
+    ${["pre", "post", "predicted", "reference"].map(k => `<img class="tile" src="../bundle/images/data-${t}-${k}.jpg" alt="">`).join('')}</div>`;
+}).join('');
+</script>
+</body></html>

@@ -1,0 +1,60 @@
+{
+ "labeled": 53850,
+ "found": 36604,
+ "missed": 17246,
+ "found_by_class": {
+  "minor-damage": 3455,
+  "destroyed": 2847,
+  "no-damage": 27225,
+  "major-damage": 3077
+ },
+ "missed_by_class": {
+  "minor-damage": 1343,
+  "no-damage": 14202,
+  "destroyed": 928,
+  "major-damage": 773
+ },
+ "found_outcome": {
+  "adjacent": 2478,
+  "correct": 33227,
+  "far": 899
+ },
+ "extra": 15474,
+ "extra_by_class": {
+  "destroyed": 1487,
+  "no-damage": 11636,
+  "major-damage": 1106,
+  "minor-damage": 1245
+ },
+ "footprints_outcome": {
+  "adjacent": 3317,
+  "correct": 49216,
+  "far": 1317
+ },
+ "footprints_confusion": [
+  [
+   40298,
+   705,
+   242,
+   182
+  ],
+  [
+   1325,
+   2945,
+   376,
+   152
+  ],
+  [
+   426,
+   367,
+   2799,
+   258
+  ],
+  [
+   246,
+   69,
+   286,
+   3174
+  ]
+ ]
+}

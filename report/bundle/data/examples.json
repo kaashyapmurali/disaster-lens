@@ -1,0 +1,98 @@
+{
+ "fire": {
+  "title": "Wildfire",
+  "scene": "santa-rosa-wildfire_00000089",
+  "event": "santa-rosa-wildfire",
+  "crop": [
+   32,
+   288,
+   480,
+   736
+  ],
+  "matched": 58,
+  "correct": 58,
+  "references": 60,
+  "detections": 63,
+  "missed": 2
+ },
+ "flooding": {
+  "title": "Flood",
+  "scene": "hurricane-harvey_00000476",
+  "event": "hurricane-harvey",
+  "crop": [
+   384,
+   128,
+   832,
+   576
+  ],
+  "matched": 65,
+  "correct": 65,
+  "references": 66,
+  "detections": 67,
+  "missed": 1
+ },
+ "wind": {
+  "title": "Hurricane wind",
+  "scene": "hurricane-matthew_00000345",
+  "event": "hurricane-matthew",
+  "crop": [
+   544,
+   320,
+   992,
+   768
+  ],
+  "matched": 86,
+  "correct": 69,
+  "references": 149,
+  "detections": 112,
+  "missed": 61
+ },
+ "tsunami": {
+  "title": "Tsunami",
+  "scene": "palu-tsunami_00000181",
+  "event": "palu-tsunami",
+  "crop": [
+   192,
+   32,
+   640,
+   480
+  ],
+  "matched": 92,
+  "correct": 86,
+  "references": 145,
+  "detections": 111,
+  "missed": 52
+ },
+ "earthquake": {
+  "title": "Earthquake",
+  "scene": "mexico-earthquake_00000069",
+  "event": "mexico-earthquake",
+  "crop": [
+   96,
+   32,
+   544,
+   480
+  ],
+  "matched": 57,
+  "correct": 52,
+  "references": 216,
+  "detections": 103,
+  "missed": 159
+ },
+ "volcano": {
+  "title": "Volcano",
+  "scene": "guatemala-volcano_00000003",
+  "event": "guatemala-volcano",
+  "crop": [
+   160,
+   0,
+   608,
+   448
+  ],
+  "matched": 3,
+  "correct": 2,
+  "references": 3,
+  "detections": 3,
+  "missed": 0
+ }
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Per-class recall</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+.fig{--w:1100px}
+.lanes{display:grid;gap:14px;margin-bottom:26px}
+.lane{display:grid;grid-template-columns:210px 22px 300px 22px 1fr;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+.lane .tag{font:650 10.5px ui-monospace,monospace;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.step{border-radius:10px;padding:11px 12px;border:1px solid var(--line);background:var(--card-2)}
+.step b{display:block;font-size:13.5px;margin-bottom:3px}.step span{font-size:11.6px;line-height:1.45;color:var(--muted);display:block}
+.step.det{border-left:4px solid var(--detector)}.step.known{border-left:4px solid var(--neutral)}.step.dmg{border-left:4px solid var(--accent-viz)}
+.arr{text-align:center;color:var(--arrow);font-size:16px}
+.rec{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rec div{border-radius:9px;padding:9px 10px;background:var(--card-2);border:1px solid var(--line)}
+.rec span{display:block;font-size:11px;color:var(--muted)}
+.rec b{display:block;font-size:23px;letter-spacing:-.6px;font-weight:600;margin-top:2px}
+.rec i{display:block;height:5px;border-radius:3px;background:var(--track);margin-top:7px;position:relative;overflow:hidden}
+.rec i::after{content:"";position:absolute;inset:0;width:var(--p);background:var(--c);border-radius:3px}
+.section{font:650 10.5px ui-monospace,monospace;letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;margin:0 0 6px}
+.subl{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.5}
+.decomp{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px 14px}
+.row{display:grid;grid-template-columns:150px 1fr 230px;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row .name b{display:block;font-size:14px}.row .name span{font-size:11.5px;color:var(--faint)}
+.bar{position:relative;height:30px;border-radius:6px;overflow:visible;display:flex;background:var(--track)}
+.bar .s{height:100%}.bar .s:first-child{border-radius:6px 0 0 6px}
+.bar .ok{background:var(--c)}
+.bar .wrong{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c) 45%,transparent) 0 5px,color-mix(in srgb,var(--c) 18%,transparent) 5px 10px)}
+.bar .miss{background:transparent}
+.bar .tick{position:absolute;top:-6px;bottom:-6px;width:0;border-left:2px dashed var(--ink);opacity:.7}
+.bar .tick span{position:absolute;top:-17px;left:-3px;font:600 9.5px ui-monospace,monospace;white-space:nowrap;color:var(--ink)}
+.row .nums{font-size:12px;line-height:1.55;color:var(--muted)}.row .nums b{color:var(--ink)}
+.key{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:12px}
+.key span{display:flex;gap:7px;align-items:center}
+.key i{width:22px;height:11px;border-radius:3px;display:inline-block}
+</style></head>
+<body>
+<div class="fig" id="figure">
+  <div class="eyebrow">Results · xBD test split</div>
+  <h1>Per-class recall with known and with detected footprints</h1>
+  <p class="lede">Recall for a class is the share of test buildings with that reference label that receive it. The damage model is the same in both rows; only the source of the building footprints differs. 53,850 labeled buildings, fine-tuned DINOv3 ViT-L damage model.</p>
+  <div id="body">
+  <div class="lanes">
+    <div class="lane">
+      <div><div class="tag">Footprints given</div><div class="step known"><b>Pre-event footprints</b><span>From the annotations (in practice: a building database aligned to the image).</span></div></div>
+      <div class="arr">→</div>
+      <div class="step dmg"><b>Damage model</b><span>Pre and post embeddings per footprint, pre and post scene context, and their differences → class.</span></div>
+      <div class="arr">→</div>
+      <div class="rec" id="known"></div>
+    </div>
+    <div class="lane">
+      <div><div class="tag">Footprints detected</div><div class="step det"><b>Mask R-CNN on the pre-event image</b><span>Detections with score ≥ 0.5; a building is found if a mask overlaps it with IoU ≥ 0.5.</span></div></div>
+      <div class="arr">→</div>
+      <div class="step dmg"><b>Damage model</b><span>Same model on the detected footprints. Missed buildings count as not recalled.</span></div>
+      <div class="arr">→</div>
+      <div class="rec" id="e2e"></div>
+    </div>
+  </div>
+  <div class="section">End-to-end recall, broken down by class</div>
+  <p class="subl">Each bar is all test buildings of one class. Solid: found and given the right class. Hatched: found, wrong class. Empty: missed by the detector. Dashed line: recall with known footprints.</p>
+  <div class="decomp" id="decomp"></div>
+  </div>
+  <div class="note" id="note"></div>
+</div>
+<script src="site.js"></script>
+<script>
+const D = window.DATA, R = D.recall, M = "Fine-tuned DINOv3 ViT-L";
+const L = ["no-damage","minor-damage","major-damage","destroyed"], N = {"no-damage":"No damage","minor-damage":"Minor damage","major-damage":"Major damage","destroyed":"Destroyed"};
+const cv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = {"no-damage":cv("--nd"),"minor-damage":cv("--minor"),"major-damage":cv("--major"),"destroyed":cv("--destroyed")};
+const pct = (x, d = 1) => (100 * x).toFixed(d) + '%';
+const cards = values => L.map(l => `<div><span>${N[l]}</span><b>${pct(values[l])}</b><i style="--p:${100 * values[l]}%;--c:${C[l]}"></i></div>`).join('');
+document.getElementById('known').innerHTML = cards(R.known_footprints[M]);
+document.getElementById('e2e').innerHTML = cards(Object.fromEntries(L.map(l => [l, R.end_to_end[M][l].recall])));
+document.getElementById('decomp').innerHTML = L.map(l => {
+  const e = R.end_to_end[M][l], k = R.known_footprints[M][l];
+  const ok = e.recall, wrong = e.found - e.recall, miss = 1 - e.found;
+  return `<div class="row"><div class="name"><b>${N[l]}</b><span>${e.buildings.toLocaleString('en-US')} buildings</span></div>
+    <div class="bar" style="--c:${C[l]}"><div class="s ok" style="width:${100 * ok}%"></div><div class="s wrong" style="width:${100 * wrong}%"></div><div class="s miss" style="width:${100 * miss}%"></div>
+      <div class="tick" style="left:${100 * k}%"><span>${pct(k, 0)}</span></div></div>
+    <div class="nums">Found by detector <b>${pct(e.found, 0)}</b><br>Right class when found <b>${pct(e.correct_given_found, 0)}</b><br>End-to-end recall <b>${pct(e.recall)}</b></div></div>`;
+}).join('') + `<div class="key"><span><i style="background:var(--destroyed)"></i>found, right class</span><span><i style="background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--destroyed) 45%,transparent) 0 5px,color-mix(in srgb,var(--destroyed) 18%,transparent) 5px 10px)"></i>found, wrong class</span><span><i style="background:var(--track)"></i>missed by the detector</span><span><i style="border-left:2px dashed var(--ink);border-radius:0;width:0;height:14px"></i>recall with known footprints</span></div>`;
+const cm = D.flow.footprints_confusion, prec = L.map((l, c) => cm[c][c] / cm.reduce((a, r) => a + r[c], 0));
+document.getElementById('note').textContent = `Recall can be raised by predicting damage more often, so the no-damage column matters too. Precision with known footprints, for reference: ${L.map((l, i) => `${N[l].toLowerCase()} ${pct(prec[i], 0)}`).join(', ')}.`;
+</script>
+</body></html>

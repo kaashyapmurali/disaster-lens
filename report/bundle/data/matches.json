@@ -1,0 +1,20 @@
+{
+ "keypoints_pre": 3212,
+ "keypoints_post": 4000,
+ "ratio_test_matches": 123,
+ "ransac_inliers": 68,
+ "median_reprojection_px": 1.6009827852249146,
+ "displacement_median_px": 1.653438575151635,
+ "displacement_max_px": 10.85728044661435,
+ "masked": {
+  "keypoints_pre": 1769,
+  "keypoints_post": 2101,
+  "ratio_test_matches": 68,
+  "ransac_inliers": 47,
+  "median_reprojection_px": 1.139743447303772,
+  "displacement_median_px": 3.278631214902596,
+  "displacement_max_px": 9.508874087656732,
+  "margin_px": 8,
+  "excluded_share": 0.22499354338842975
+ }
+}

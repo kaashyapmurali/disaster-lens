@@ -1,0 +1,334 @@
+{
+ "schema_version": 1,
+ "project": "disaster-lens",
+ "built_at": "2026-10-27T16:36:33+00:00",
+ "source_commit": "e5d88753c476a5fa6fc54ffd8214e283f0209163",
+ "source_dirty": true,
+ "note": "source_commit is the commit the bundle was built from; commit the bundle itself afterwards.",
+ "files": {
+  "data/aggregate-metrics.json": {
+   "sha256": "401371b60b29c50e74164d9f6672752f91241ba3f18521e1921fb12cf5168205",
+   "bytes": 3783
+  },
+  "data/change-measures.csv": {
+   "sha256": "3d836c96199b22673d132e50835820190d3b07df1e532b6a9a2a5e5aa2f1ec39",
+   "bytes": 14179
+  },
+  "data/class-recall.json": {
+   "sha256": "f1606cf741003abc08a094a4608455c2390bc9059a1b581976548223206b117f",
+   "bytes": 3565
+  },
+  "data/dataset.json": {
+   "sha256": "59f88fda564341eaaff2f7bea89712152d160c238e825476861d3a747df5044e",
+   "bytes": 632
+  },
+  "data/example-building.json": {
+   "sha256": "5e4adb3fb77cccb7381667279f38ef056e4c3c1e803a3f115a3df9412733a54d",
+   "bytes": 96
+  },
+  "data/examples.json": {
+   "sha256": "3c9aeb1552736fcb5c31a96013d0fb856c5fbba5f901b76a6e6059d7bb1ad62a",
+   "bytes": 1496
+  },
+  "data/explorer.json": {
+   "sha256": "bc097d43ee060a420d435b4e89dfdc266ef7211eac4ea0645dc6c0c6092070da",
+   "bytes": 79196
+  },
+  "data/matches.json": {
+   "sha256": "aa42d2f7c616ddf1f4d4eb2d9ef7ea209250b0e0a38ffc120edc0284748b4478",
+   "bytes": 554
+  },
+  "data/no-change.json": {
+   "sha256": "2d5d0652a23d10af047a3dfc40c0e4229c6821252377ca947423dccbc41e52fb",
+   "bytes": 995
+  },
+  "data/scenes.json": {
+   "sha256": "998a0bce44102547da40ff40c14e87b74389cd471455e55e3207ef0a7231204c",
+   "bytes": 3981
+  },
+  "data/test-flow.json": {
+   "sha256": "54b70f4a63cf1f5dc3666775277ccdd2ec9f3c984826ed28ffb796025b1b2be1",
+   "bytes": 773
+  },
+  "images/arch-damage.jpg": {
+   "sha256": "95303c007a03e4ef12da5f988c54c2db4b3b4bdd2709529e4320bd40b10435d7",
+   "bytes": 57631
+  },
+  "images/arch-found.jpg": {
+   "sha256": "c94d8e8360f08a001ec082c748bb6fbd48346b24fff987ec8abd569518e45fd0",
+   "bytes": 56779
+  },
+  "images/arch-post.jpg": {
+   "sha256": "c494af66340986ca71ae0ae0e68febddd018d46d552b853b6ccf2517815ec9d5",
+   "bytes": 52771
+  },
+  "images/arch-pre.jpg": {
+   "sha256": "3fe9ca38bc0446f535024a3d67c0a7544962c41fc2d62b4fa6a520e26ff67e5b",
+   "bytes": 46659
+  },
+  "images/cover.jpg": {
+   "sha256": "44e0a47a851e0f3f991df214c8b82f28f850f486d91ba8d0304bd946a40ba25d",
+   "bytes": 390636
+  },
+  "images/data-earthquake-post.jpg": {
+   "sha256": "d224b278b02e2b42538b7d8922d2b16e9476440416e1d0c29059d6e486b62c75",
+   "bytes": 47816
+  },
+  "images/data-earthquake-pre.jpg": {
+   "sha256": "8ea403a08b3d0b0ab843565d947c08e7b3305267ee0e24abd978ea35023bdac2",
+   "bytes": 73477
+  },
+  "images/data-earthquake-predicted.jpg": {
+   "sha256": "6a90d98bd6451ae2514eb1a7022b83b3155c7b58cc671a1d241fe19b5b441afd",
+   "bytes": 61531
+  },
+  "images/data-earthquake-reference.jpg": {
+   "sha256": "89332eda1de33ad95c6fd58f9e2bc54037439a9f6ecdc58a67674a8e33762723",
+   "bytes": 68414
+  },
+  "images/data-fire-post.jpg": {
+   "sha256": "00dcbe5ef98ca958d6839a417f70f3df966391bf151c6c0cbefc68d7597227b1",
+   "bytes": 50723
+  },
+  "images/data-fire-pre.jpg": {
+   "sha256": "e978e9bb8b0ffbc7f289a217a1806790546b8852fbcfc25c29a5cfa2a2f78e4e",
+   "bytes": 42488
+  },
+  "images/data-fire-predicted.jpg": {
+   "sha256": "a7b12d833e2d004bf300472ae62e575fdf4d70dc0b17234459a61b3c6a223567",
+   "bytes": 54716
+  },
+  "images/data-fire-reference.jpg": {
+   "sha256": "34d2be00badaaaebaf9e1a01d21fe4f3e5c774b1323b5f39a7b8b89d7f3e8078",
+   "bytes": 54510
+  },
+  "images/data-flooding-post.jpg": {
+   "sha256": "60137016caf31464d5f983eb24be7cb049bec9d46066275526d692d23c63f28d",
+   "bytes": 36213
+  },
+  "images/data-flooding-pre.jpg": {
+   "sha256": "f8583b7955b4dfc24f2b49cd80235e379c24cc23ed7e589a32c71e978e9246bf",
+   "bytes": 44651
+  },
+  "images/data-flooding-predicted.jpg": {
+   "sha256": "d5c82f60fc00a56a847d39733da8270e429656dc38c7ef9fb13e530f189128ad",
+   "bytes": 56378
+  },
+  "images/data-flooding-reference.jpg": {
+   "sha256": "e62f8efcff1a390fbb272bd8e2818e77b8437cfa1d5ae48363629abb8d55246e",
+   "bytes": 54601
+  },
+  "images/data-tsunami-post.jpg": {
+   "sha256": "1a25dcbe6d55463fb9e638736a43b3244a124c1c260a447b8fe435d1d0387e37",
+   "bytes": 40365
+  },
+  "images/data-tsunami-pre.jpg": {
+   "sha256": "4dd2845d4595e3bc3db1a41c4f0bac6619f5ac3dd82e2fcec4cb69d6b7bbf8a0",
+   "bytes": 40867
+  },
+  "images/data-tsunami-predicted.jpg": {
+   "sha256": "995929413207c4d8a456616bcfe30795f5360111f8b635c39fb7683cf73f106f",
+   "bytes": 47397
+  },
+  "images/data-tsunami-reference.jpg": {
+   "sha256": "075422eb3687b98c0178741a5644bfe66e34a3267ca39275f6d1d38873648b1a",
+   "bytes": 49634
+  },
+  "images/data-volcano-post.jpg": {
+   "sha256": "e1ceb8fb7250f614cac4725045cd4f4437d241c64076bde0e9e4e4f02ae759da",
+   "bytes": 40088
+  },
+  "images/data-volcano-pre.jpg": {
+   "sha256": "c05dc56ff3de7e594c74cd6652b4b2c24c1a93d6d5589e302b65ba58f5432db5",
+   "bytes": 38227
+  },
+  "images/data-volcano-predicted.jpg": {
+   "sha256": "de6becc3b075d84a67e893cae6a91005e9ed8a00cb1a422e792f36e750176565",
+   "bytes": 40868
+  },
+  "images/data-volcano-reference.jpg": {
+   "sha256": "a5217f59a2620720de923ab5d750c2058d2120a4e65aca1366803db15f5667f9",
+   "bytes": 41136
+  },
+  "images/data-wind-post.jpg": {
+   "sha256": "b9dcc160b0b5ee0225cd77fcdb9da3b109c47a17afa348620e691169d544de24",
+   "bytes": 45904
+  },
+  "images/data-wind-pre.jpg": {
+   "sha256": "4e8f2f1655ca64f2a2189b0a4f45238e0b34c89eb2921765d582d6456041e1cb",
+   "bytes": 48582
+  },
+  "images/data-wind-predicted.jpg": {
+   "sha256": "b71d3d8c10fbff587e7a120b7b35d2cc174f5a42af491ae058cf2e3f1294dcd1",
+   "bytes": 62292
+  },
+  "images/data-wind-reference.jpg": {
+   "sha256": "59f80208688a2c10e6cafa6457b20089281e9707ad7a59d4cb708f22506b61a0",
+   "bytes": 70187
+  },
+  "images/explorer-damage.jpg": {
+   "sha256": "dca4700819f9eeb59aff30c6b155cee1ebc1795f6c653e9d5bb4b620f2fcf539",
+   "bytes": 174418
+  },
+  "images/features-change.jpg": {
+   "sha256": "6702c423283285c223ed1105b294dbbe0598e98b0835232adfd467497038599f",
+   "bytes": 104728
+  },
+  "images/features-post.jpg": {
+   "sha256": "6c19f24dc377a6a7e4ceb95b2b7059e8272cefa5ca813594b6870599121f7c9f",
+   "bytes": 80981
+  },
+  "images/features-pre.jpg": {
+   "sha256": "da0114b281aa940468a70fc17b971a71f3952d55dd3d1b6ee813f88534be29cd",
+   "bytes": 78745
+  },
+  "images/matches-masked.jpg": {
+   "sha256": "4bc8df195682358b685a6c285a64fd5d1abf939deada6f9d8f0e1c488da7eced",
+   "bytes": 143379
+  },
+  "images/matches.jpg": {
+   "sha256": "56bd61365718532bf4517d3b9d63c23118ebe9c75263320da8db139c44d56bb3",
+   "bytes": 152466
+  },
+  "images/scene-hurricane-harvey_00000476-post.jpg": {
+   "sha256": "6ed37efde7736a751c81bcc729355330b4f7c3aeb003cf7fcf3db08dcc9ddfbb",
+   "bytes": 104353
+  },
+  "images/scene-hurricane-harvey_00000476-pre.jpg": {
+   "sha256": "c8aa7939c1903075f289e2750425354db349af1a9b8308de75362434c46218a9",
+   "bytes": 129645
+  },
+  "images/scene-hurricane-harvey_00000479-post.jpg": {
+   "sha256": "08673b403449b494d9c74cef6da144c39a6bfbc09cbeb070124d4d28f07d7094",
+   "bytes": 112115
+  },
+  "images/scene-hurricane-harvey_00000479-pre.jpg": {
+   "sha256": "66a4cb7e75ab0bd0e3ea98567c7d85995eab81b7ed59d0df375d0c57e3fba736",
+   "bytes": 119365
+  },
+  "images/scene-hurricane-matthew_00000105-post.jpg": {
+   "sha256": "35a0441642371d31928f41055f1ed6399f962d937ee5759a0e11bf56e73a9fd4",
+   "bytes": 109082
+  },
+  "images/scene-hurricane-matthew_00000105-pre.jpg": {
+   "sha256": "23772e3324ab1d8a992ad9b496201685a705f761695b05aa264711801456140e",
+   "bytes": 134455
+  },
+  "images/scene-hurricane-matthew_00000345-post.jpg": {
+   "sha256": "27ca91a2b0673a5e019dda971795cbf2b52174fb82328ca0c5ab81c2d7df2a40",
+   "bytes": 134307
+  },
+  "images/scene-hurricane-matthew_00000345-pre.jpg": {
+   "sha256": "795b40e9f579c3436f3fe7f732245d84d2ea757841b1c03945151f08f8319684",
+   "bytes": 143661
+  },
+  "images/scene-mexico-earthquake_00000058-post.jpg": {
+   "sha256": "058367c53d494a2e2740042c85798d66404dd0459c1932f59e049081b98cf13b",
+   "bytes": 126936
+  },
+  "images/scene-mexico-earthquake_00000058-pre.jpg": {
+   "sha256": "d9233649752db8a4af67fb58c04d05ecebdf45f969b76014b124af5c237a4055",
+   "bytes": 204943
+  },
+  "images/scene-mexico-earthquake_00000069-post.jpg": {
+   "sha256": "1f88d8d59c6ccd933dc08107770e14182fdbeb4d94f4a3a20fe0fd8db0fd7454",
+   "bytes": 126659
+  },
+  "images/scene-mexico-earthquake_00000069-pre.jpg": {
+   "sha256": "09cdb991e6428f56902891979ba8e4bdf73451cf3541da0fd343d7ea215a2415",
+   "bytes": 197894
+  },
+  "images/scene-palu-tsunami_00000163-post.jpg": {
+   "sha256": "f2ce0e507691285788e18e99e5aea03181a129d1c301fc9b244e7218aa3704bc",
+   "bytes": 109483
+  },
+  "images/scene-palu-tsunami_00000163-pre.jpg": {
+   "sha256": "3fa6d0f7b18ed7eb705266c308481268f3fac7374a3c241b2e52ec503f872d63",
+   "bytes": 102255
+  },
+  "images/scene-palu-tsunami_00000181-post.jpg": {
+   "sha256": "8c45d5b1b1d83e3f7d3eff5287206364629a5ca12d193f0e887c7d991c64e5f1",
+   "bytes": 115800
+  },
+  "images/scene-palu-tsunami_00000181-pre.jpg": {
+   "sha256": "f67e808b8841a1ba0bb62d18ec39fc3ec1614b8cc013dbe4ee55f53f9aef5fd9",
+   "bytes": 116445
+  },
+  "images/scene-santa-rosa-wildfire_00000012-post.jpg": {
+   "sha256": "69756aa5ebd1d693b88f4777b97b67735ebba408bc4e9108ca9a83178ab0301c",
+   "bytes": 154182
+  },
+  "images/scene-santa-rosa-wildfire_00000012-pre.jpg": {
+   "sha256": "e75687ac4a9f8efcc9028b3c43a9601b83310a220742c9c498679a2698c74ebf",
+   "bytes": 128560
+  },
+  "images/scene-santa-rosa-wildfire_00000089-post.jpg": {
+   "sha256": "fa041a191f410628bfef3bab262add8a74b5e88dc5c19aa55d7fd6172c941460",
+   "bytes": 144942
+  },
+  "images/scene-santa-rosa-wildfire_00000089-pre.jpg": {
+   "sha256": "5d0073bc335d8100b516365884eb42d128ff4e6e9a447c0e509c2d103744a8cc",
+   "bytes": 122534
+  },
+  "images/scene-socal-fire_00000937-post.jpg": {
+   "sha256": "07714a033ade5bc8b9078acd3e3075770d186f15a0f0d290432860d8ead25071",
+   "bytes": 160761
+  },
+  "images/scene-socal-fire_00000937-pre.jpg": {
+   "sha256": "6ffa634de33804779f107112b4b24ba4f8b44ce9af013f75196a135d3762040a",
+   "bytes": 147309
+  },
+  "media/scene-explorer.gif": {
+   "sha256": "459e77b33cb17dde25c78da25812d69cb5a1b7bf01d85c9d881391571133191c",
+   "bytes": 543287
+  },
+  "scenes/hurricane-harvey_00000476.json": {
+   "sha256": "89c8c033b3c2a42ddfba0fa2fcdc89388391ec1d2d4fcf5569db05e8850d90ba",
+   "bytes": 42399
+  },
+  "scenes/hurricane-harvey_00000479.json": {
+   "sha256": "17a67211f79abe3731130c4d2566e6b1fb1a462f02896b1928958b8c2241761a",
+   "bytes": 47328
+  },
+  "scenes/hurricane-matthew_00000105.json": {
+   "sha256": "efda1d7dff763f60a00e3ca75f124675ad3ec9d921aa98be2d58c4e4f931d60a",
+   "bytes": 61768
+  },
+  "scenes/hurricane-matthew_00000345.json": {
+   "sha256": "76d389ee89bd782dee9834fe6932e655125617a39476ab45f923b853b3112495",
+   "bytes": 61910
+  },
+  "scenes/mexico-earthquake_00000058.json": {
+   "sha256": "75b9a1e50f8c5c740d6e8998d771773b259a2f945a7c6cf9679e34da3edbf213",
+   "bytes": 92630
+  },
+  "scenes/mexico-earthquake_00000069.json": {
+   "sha256": "8535ed49d93783b34561584219e81cbad8acf57b38275d2b3b3f624cda5142b7",
+   "bytes": 67905
+  },
+  "scenes/palu-tsunami_00000163.json": {
+   "sha256": "db414f9db3f49d5eff82e647ec0064b095150a1cb23620c3cc8e289ae499ac92",
+   "bytes": 46042
+  },
+  "scenes/palu-tsunami_00000181.json": {
+   "sha256": "a47504530dd1e446069f650f00d6dde4e4bd5d16c8a6d00b5169ef1c0e308c87",
+   "bytes": 73849
+  },
+  "scenes/santa-rosa-wildfire_00000012.json": {
+   "sha256": "b5490b5dfa58ee791f2ef1978fdde89fc5decc0c64eaedde72627766e18a6785",
+   "bytes": 34681
+  },
+  "scenes/santa-rosa-wildfire_00000089.json": {
+   "sha256": "438166e21be3ebcccc009aff73d33dc511f1a3e9dd1bca94efcbaeed6c7ae839",
+   "bytes": 39944
+  },
+  "scenes/socal-fire_00000937.json": {
+   "sha256": "6793292e239b207de802cd853d7ab987e31ad8e6fde60c2bd82a8d0d30706504",
+   "bytes": 21064
+  },
+  "site.json": {
+   "sha256": "eadf2e8d6790bcc629e53abdb487462abc6a90d81d9fdd1b66cdb508e4a3d9cd",
+   "bytes": 49213
+  }
+ }
+}

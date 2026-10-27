@@ -1,0 +1,233 @@
+[
+ {
+  "id": "socal-fire_00000937",
+  "title": "Wildfire",
+  "event": "Southern California wildfire",
+  "size": 880,
+  "detections": 72,
+  "matched": 53,
+  "correct": 42,
+  "missed": 10,
+  "predicted": {
+   "no-damage": 43,
+   "minor-damage": 0,
+   "major-damage": 0,
+   "destroyed": 29
+  },
+  "outcomes": {
+   "correct": 42,
+   "wrong": 11,
+   "extra": 19
+  }
+ },
+ {
+  "id": "santa-rosa-wildfire_00000089",
+  "title": "Wildfire",
+  "event": "Santa Rosa wildfire",
+  "size": 768,
+  "detections": 157,
+  "matched": 148,
+  "correct": 147,
+  "missed": 5,
+  "predicted": {
+   "no-damage": 4,
+   "minor-damage": 0,
+   "major-damage": 0,
+   "destroyed": 153
+  },
+  "outcomes": {
+   "correct": 147,
+   "wrong": 1,
+   "extra": 9
+  }
+ },
+ {
+  "id": "santa-rosa-wildfire_00000012",
+  "title": "Wildfire",
+  "event": "Santa Rosa wildfire",
+  "size": 768,
+  "detections": 113,
+  "matched": 93,
+  "correct": 92,
+  "missed": 16,
+  "predicted": {
+   "no-damage": 13,
+   "minor-damage": 0,
+   "major-damage": 1,
+   "destroyed": 99
+  },
+  "outcomes": {
+   "correct": 92,
+   "wrong": 1,
+   "extra": 20
+  }
+ },
+ {
+  "id": "hurricane-harvey_00000476",
+  "title": "Flood",
+  "event": "Hurricane Harvey",
+  "size": 768,
+  "detections": 164,
+  "matched": 159,
+  "correct": 156,
+  "missed": 3,
+  "predicted": {
+   "no-damage": 0,
+   "minor-damage": 0,
+   "major-damage": 164,
+   "destroyed": 0
+  },
+  "outcomes": {
+   "correct": 156,
+   "wrong": 3,
+   "extra": 5
+  }
+ },
+ {
+  "id": "hurricane-harvey_00000479",
+  "title": "Flood",
+  "event": "Hurricane Harvey",
+  "size": 768,
+  "detections": 148,
+  "matched": 126,
+  "correct": 99,
+  "missed": 31,
+  "predicted": {
+   "no-damage": 20,
+   "minor-damage": 120,
+   "major-damage": 8,
+   "destroyed": 0
+  },
+  "outcomes": {
+   "correct": 99,
+   "wrong": 27,
+   "extra": 22
+  }
+ },
+ {
+  "id": "hurricane-matthew_00000345",
+  "title": "Hurricane wind",
+  "event": "Hurricane Matthew",
+  "size": 768,
+  "detections": 294,
+  "matched": 207,
+  "correct": 170,
+  "missed": 163,
+  "predicted": {
+   "no-damage": 5,
+   "minor-damage": 245,
+   "major-damage": 6,
+   "destroyed": 38
+  },
+  "outcomes": {
+   "correct": 170,
+   "wrong": 37,
+   "extra": 87
+  }
+ },
+ {
+  "id": "hurricane-matthew_00000105",
+  "title": "Hurricane wind",
+  "event": "Hurricane Matthew",
+  "size": 768,
+  "detections": 198,
+  "matched": 145,
+  "correct": 119,
+  "missed": 198,
+  "predicted": {
+   "no-damage": 2,
+   "minor-damage": 189,
+   "major-damage": 6,
+   "destroyed": 1
+  },
+  "outcomes": {
+   "correct": 119,
+   "wrong": 26,
+   "extra": 53
+  }
+ },
+ {
+  "id": "palu-tsunami_00000181",
+  "title": "Tsunami",
+  "event": "Palu tsunami",
+  "size": 768,
+  "detections": 289,
+  "matched": 235,
+  "correct": 198,
+  "missed": 135,
+  "predicted": {
+   "no-damage": 72,
+   "minor-damage": 0,
+   "major-damage": 0,
+   "destroyed": 217
+  },
+  "outcomes": {
+   "correct": 198,
+   "wrong": 37,
+   "extra": 54
+  }
+ },
+ {
+  "id": "palu-tsunami_00000163",
+  "title": "Tsunami",
+  "event": "Palu tsunami",
+  "size": 768,
+  "detections": 187,
+  "matched": 146,
+  "correct": 126,
+  "missed": 64,
+  "predicted": {
+   "no-damage": 38,
+   "minor-damage": 0,
+   "major-damage": 10,
+   "destroyed": 139
+  },
+  "outcomes": {
+   "correct": 126,
+   "wrong": 20,
+   "extra": 41
+  }
+ },
+ {
+  "id": "mexico-earthquake_00000069",
+  "title": "Earthquake",
+  "event": "Mexico earthquake",
+  "size": 768,
+  "detections": 179,
+  "matched": 95,
+  "correct": 89,
+  "missed": 192,
+  "predicted": {
+   "no-damage": 179,
+   "minor-damage": 0,
+   "major-damage": 0,
+   "destroyed": 0
+  },
+  "outcomes": {
+   "correct": 89,
+   "wrong": 6,
+   "extra": 84
+  }
+ },
+ {
+  "id": "mexico-earthquake_00000058",
+  "title": "Earthquake",
+  "event": "Mexico earthquake",
+  "size": 768,
+  "detections": 200,
+  "matched": 108,
+  "correct": 101,
+  "missed": 350,
+  "predicted": {
+   "no-damage": 200,
+   "minor-damage": 0,
+   "major-damage": 0,
+   "destroyed": 0
+  },
+  "outcomes": {
+   "correct": 101,
+   "wrong": 7,
+   "extra": 92
+  }
+ }
+]

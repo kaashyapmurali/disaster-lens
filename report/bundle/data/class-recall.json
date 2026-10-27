@@ -1,0 +1,140 @@
+{
+ "classes": [
+  "no-damage",
+  "minor-damage",
+  "major-damage",
+  "destroyed"
+ ],
+ "known_footprints": {
+  "Post-only ResNet-18": {
+   "no-damage": 0.8580153040287735,
+   "minor-damage": 0.621925802417674,
+   "major-damage": 0.708051948051948,
+   "destroyed": 0.6744370860927152
+  },
+  "Paired ResNet-18": {
+   "no-damage": 0.9680401670408187,
+   "minor-damage": 0.40725302209253855,
+   "major-damage": 0.6768831168831169,
+   "destroyed": 0.7576158940397351
+  },
+  "Frozen DINOv3 ViT-L": {
+   "no-damage": 0.9755232095010501,
+   "minor-damage": 0.5114631096290121,
+   "major-damage": 0.745974025974026,
+   "destroyed": 0.8423841059602649
+  },
+  "Fine-tuned DINOv3 ViT-L": {
+   "no-damage": 0.9727472421367707,
+   "minor-damage": 0.6137974155898291,
+   "major-damage": 0.727012987012987,
+   "destroyed": 0.840794701986755
+  }
+ },
+ "end_to_end": {
+  "Post-only ResNet-18": {
+   "no-damage": {
+    "buildings": 41427,
+    "found": 0.6571800999348251,
+    "correct_given_found": 0.8368778696051423,
+    "recall": 0.549979481980351
+   },
+   "minor-damage": {
+    "buildings": 4798,
+    "found": 0.7200917048770321,
+    "correct_given_found": 0.6101302460202604,
+    "recall": 0.4393497290537724
+   },
+   "major-damage": {
+    "buildings": 3850,
+    "found": 0.7992207792207793,
+    "correct_given_found": 0.7279818004549886,
+    "recall": 0.5818181818181818
+   },
+   "destroyed": {
+    "buildings": 3775,
+    "found": 0.7541721854304636,
+    "correct_given_found": 0.7077625570776256,
+    "recall": 0.5337748344370861
+   }
+  },
+  "Paired ResNet-18": {
+   "no-damage": {
+    "buildings": 41427,
+    "found": 0.6571800999348251,
+    "correct_given_found": 0.9662075298438935,
+    "recall": 0.6349723610205904
+   },
+   "minor-damage": {
+    "buildings": 4798,
+    "found": 0.7200917048770321,
+    "correct_given_found": 0.3667149059334298,
+    "recall": 0.26406836181742394
+   },
+   "major-damage": {
+    "buildings": 3850,
+    "found": 0.7992207792207793,
+    "correct_given_found": 0.7036074098147547,
+    "recall": 0.5623376623376624
+   },
+   "destroyed": {
+    "buildings": 3775,
+    "found": 0.7541721854304636,
+    "correct_given_found": 0.7983842641376888,
+    "recall": 0.6021192052980132
+   }
+  },
+  "Frozen DINOv3 ViT-L": {
+   "no-damage": {
+    "buildings": 41427,
+    "found": 0.6571800999348251,
+    "correct_given_found": 0.9740679522497704,
+    "recall": 0.6401380742028145
+   },
+   "minor-damage": {
+    "buildings": 4798,
+    "found": 0.7200917048770321,
+    "correct_given_found": 0.48393632416787263,
+    "recall": 0.3484785327219675
+   },
+   "major-damage": {
+    "buildings": 3850,
+    "found": 0.7992207792207793,
+    "correct_given_found": 0.764055898602535,
+    "recall": 0.6106493506493507
+   },
+   "destroyed": {
+    "buildings": 3775,
+    "found": 0.7541721854304636,
+    "correct_given_found": 0.8665261678960309,
+    "recall": 0.6535099337748345
+   }
+  },
+  "Fine-tuned DINOv3 ViT-L": {
+   "no-damage": {
+    "buildings": 41427,
+    "found": 0.6571800999348251,
+    "correct_given_found": 0.9705417814508723,
+    "recall": 0.6378207449248074
+   },
+   "minor-damage": {
+    "buildings": 4798,
+    "found": 0.7200917048770321,
+    "correct_given_found": 0.5916063675832127,
+    "recall": 0.4260108378491038
+   },
+   "major-damage": {
+    "buildings": 3850,
+    "found": 0.7992207792207793,
+    "correct_given_found": 0.7504062398440039,
+    "recall": 0.5997402597402598
+   },
+   "destroyed": {
+    "buildings": 3775,
+    "found": 0.7541721854304636,
+    "correct_given_found": 0.8609062170706007,
+    "recall": 0.649271523178808
+   }
+  }
+ }
+}

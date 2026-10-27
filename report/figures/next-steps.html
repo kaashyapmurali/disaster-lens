@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Next steps</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+.fig{--w:1100px}
+.section{font:650 10.5px ui-monospace,monospace;letter-spacing:1.6px;color:var(--accent);text-transform:uppercase;margin:24px 0 10px}
+.pipe{display:grid;grid-template-columns:1fr 18px 1.25fr 18px 1fr 18px 1fr;align-items:stretch}
+.pipe .arr{display:flex;align-items:center;justify-content:center;color:var(--arrow);font-size:16px}
+.ps{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+.ps .n{font:650 10px ui-monospace,monospace;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase}
+.ps h4{font-size:14px;margin:5px 0 4px}.ps p{font-size:11.8px;line-height:1.5;color:var(--muted);margin:0}
+.ps.key{border:2px solid var(--new-line);background:var(--gate-bg)}
+.ps.key .n{color:var(--gate-num)}
+.ps.done{border-left:4px solid var(--accent-viz)}
+.flag{display:inline-block;margin-top:8px;font:650 10px ui-monospace,monospace;letter-spacing:1px;color:var(--gate-num);border:1px solid var(--new-line);border-radius:4px;padding:3px 6px}
+.fallback{margin-top:8px;font-size:11.8px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.fallback b{color:var(--ink)}
+.cases{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.case{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.case .n{font:650 10.5px ui-monospace,monospace;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent)}
+.case h3{font-size:15.5px;margin:5px 0 10px}
+.case ol{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:7px}
+.case li{counter-increment:s;display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:12.2px;line-height:1.5;color:var(--ink)}
+.case li::before{content:counter(s);width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:650 10.5px/20px ui-monospace,monospace;text-align:center}
+.case li span{color:var(--muted)}
+.shared{margin-top:12px;background:var(--card-2);border:1px dashed var(--line);border-radius:11px;padding:11px 14px;font-size:12.2px;line-height:1.55;color:var(--muted)}
+.shared b{color:var(--ink)}
+.real{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px}
+.real img{width:100%;border-radius:8px;display:block}
+.real h3{font-size:15px;margin:0 0 8px}.real p{font-size:12.2px;line-height:1.55;color:var(--muted);margin:0 0 10px}
+.cmp-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp-t th{text-align:right;font:600 10px ui-monospace,monospace;letter-spacing:.8px;color:var(--muted);padding:6px 4px;border-bottom:1px solid var(--line)}
+.cmp-t th:first-child,.cmp-t td:first-child{text-align:left}
+.cmp-t td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.cmp-t td:last-child{font-weight:650}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nums div{border:1px solid var(--line);border-radius:9px;padding:8px 10px}.nums b{display:block;font-size:19px;letter-spacing:-.4px}.nums span{font-size:11px;color:var(--muted)}
+.more{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.more div{border-top:2px solid var(--line);padding-top:9px}
+.more b{display:block;font-size:12.8px;margin-bottom:4px}.more span{font-size:11.6px;line-height:1.5;color:var(--muted)}
+</style></head>
+<body>
+<div class="fig" id="figure">
+  <div class="eyebrow">Next steps</div>
+  <h1>Next steps</h1>
+  <p class="lede">In deployment, the damage model needs building footprints that line up with the post-disaster image. With aligned footprints it reaches the known-footprint recall in the results; without them it depends on the detector. In xBD the pairs arrive aligned with their footprints. A real post-disaster image arrives with location metadata only, so aligning it to a pre-event reference is the first step and the main open problem.</p>
+
+  <div id="ns-top">
+  <div class="section">Deployment pipeline</div>
+  <div class="pipe">
+    <div class="ps"><div class="n">Input</div><h4>Post-disaster image</h4><p>Plus whatever metadata comes with it: GPS position, and possibly the camera pose (viewing angle, altitude).</p></div>
+    <div class="arr">→</div>
+    <div class="ps key"><div class="n">Step 1 · bottleneck</div><h4>Align to a pre-event reference</h4><p>Find the matching pre-event image and its building footprints, and estimate the transform between the two images.</p><span class="flag">NOT BUILT YET</span></div>
+    <div class="arr">→</div>
+    <div class="ps"><div class="n">Step 2</div><h4>Transfer footprints</h4><p>Warp the reference footprints onto the post-disaster image.</p></div>
+    <div class="arr">→</div>
+    <div class="ps done"><div class="n">Step 3 · this project</div><h4>Damage per building</h4><p>Pre/post embeddings, scene context and their differences for each footprint → class.</p></div>
+  </div>
+  <div class="fallback"><b>If no reliable alignment:</b> detect buildings on the image instead (lower recall, see results) and flag the area for review.</div>
+
+  <div class="section">Approach to step 1, by available metadata</div>
+  <div class="cases">
+    <div class="case"><div class="n">Case A</div><h3>Camera pose known</h3>
+      <ol><li><div>GPS position, altitude, orientation and lens <span>describe the camera completely.</span></div></li>
+          <li><div>Project rays from the image corners to the ground <span>to get the image's ground footprint: a narrow search area and a first alignment.</span></div></li>
+          <li><div>Fetch the pre-event reference and building footprints for that area <span>(or use an already matched reference).</span></div></li>
+          <li><div>Refine with keypoint matching on non-building structure <span>and fit the transform with RANSAC.</span></div></li></ol></div>
+    <div class="case"><div class="n">Case B</div><h3>Camera position only</h3>
+      <ol><li><div>Search radius = GPS error + visibility range <span>(how far the camera can see from its altitude).</span></div></li>
+          <li><div>Collect candidate reference tiles inside the radius <span>with their building footprints.</span></div></li>
+          <li><div>Rank candidates with an image embedder <span>(global embeddings, nearest-neighbour search).</span></div></li>
+          <li><div>Align the best candidates with keypoints on non-building structure <span>and RANSAC; accept only if enough keypoints agree.</span></div></li></ol></div>
+  </div>
+  <div class="shared"><b>In both cases, match only on structure that is not being assessed: roads, bridges, rivers, forest and field edges.</b> Buildings are excluded: they are what the damage model assesses, and they are what the disaster changes. The reference footprints give the mask.</div>
+  </div>
+  <div id="ns-bottom">
+  <div class="section">Keypoint matching on one test pair, buildings excluded</div>
+  <div class="real">
+    <img src="../bundle/images/matches-masked.jpg" alt="SIFT matches between the pre- and post-fire images with building footprints masked out (dark): consistent matches on roads and open ground.">
+    <div><h3>Alignment works without buildings</h3>
+      <p>SIFT keypoints, ratio test and RANSAC on the wildfire scene, with every pre-event building footprint (plus an 8 px margin) masked out on both images (dark areas). Green: consistent with the fitted transform. Red: rejected.</p>
+      <table class="cmp-t"><thead><tr><th></th><th>All keypoints</th><th>Buildings excluded</th></tr></thead><tbody id="cmp"></tbody></table></div>
+  </div>
+  <div class="section">Also next</div>
+  <div class="more">
+    <div><b>Misalignment tolerance</b><span>Shift the footprints synthetically and measure how recall degrades; this sets the accuracy step 1 needs.</span></div>
+    <div><b>Unseen disasters</b><span>All results come from ten events seen in training. Hold out whole events.</span></div>
+    <div><b>Detection fallback</b><span>78% of missed buildings already have a correct outline with a low score; re-scoring candidates is a tested pilot.</span></div>
+    <div><b>Minor damage</b><span>Minor vs. no damage is the main confusion; pool features over the building mask instead of its box.</span></div>
+  </div>
+  </div>
+  <div class="note">Matching: OpenCV SIFT (4,000 features max), Lowe ratio 0.75, RANSAC homography with a 3 px threshold, on an 880 px crop of xBD test scene socal-fire_00000937; building mask from the pre-event footprints. One pair, for illustration; not a registration benchmark.</div>
+</div>
+<script src="site.js"></script>
+<script>
+const M = window.DATA.matches;
+const A = M, B = M.masked, row = (label, a, b) => `<tr><td>${label}</td><td>${a}</td><td>${b}</td></tr>`;
+document.getElementById('cmp').innerHTML =
+  row('Area used for matching', '100%', `${(100 * (1 - B.excluded_share)).toFixed(0)}%`) +
+  row('Descriptor matches (ratio test)', A.ratio_test_matches, B.ratio_test_matches) +
+  row('Consistent after RANSAC', A.ransac_inliers, B.ransac_inliers) +
+  row('Median residual of the fit', `${A.median_reprojection_px.toFixed(1)} px`, `${B.median_reprojection_px.toFixed(1)} px`);
+</script>
+</body></html>

@@ -25,6 +25,9 @@ htmlcov/
 build/
 dist/
 
+# Temporary data file written while rendering the README figures
+/report/figures/site.js
+
 # Local-only analyses, report drafts and reproduction scripts
 /local/
 /docs/

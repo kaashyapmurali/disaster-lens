@@ -1,0 +1,38 @@
+{
+ "train+validation": {
+  "buildings": 159794,
+  "scenes": 2241,
+  "labels": {
+   "no-damage": 117426,
+   "minor-damage": 14980,
+   "destroyed": 13227,
+   "major-damage": 14161
+  },
+  "by_type": {
+   "volcano": 682,
+   "flooding": 37316,
+   "wind": 35609,
+   "earthquake": 32196,
+   "tsunami": 30993,
+   "fire": 22998
+  }
+ },
+ "test": {
+  "buildings": 53850,
+  "scenes": 739,
+  "labels": {
+   "minor-damage": 4798,
+   "destroyed": 3775,
+   "no-damage": 41427,
+   "major-damage": 3850
+  },
+  "by_type": {
+   "volcano": 30,
+   "flooding": 12117,
+   "wind": 9573,
+   "earthquake": 11400,
+   "tsunami": 12414,
+   "fire": 8316
+  }
+ }
+}
