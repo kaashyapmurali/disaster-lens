@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BUNDLE = ROOT / "report/bundle"
-DATA, IMAGES, SCENES, MEDIA = (BUNDLE / name for name in ("data", "images", "scenes", "media"))
+DATA, IMAGES, SCENES = (BUNDLE / name for name in ("data", "images", "scenes"))
 
 # Local inputs: model outputs and xBD imagery (see report/README.md for how they are produced).
 DATASETS = ROOT / "datasets"

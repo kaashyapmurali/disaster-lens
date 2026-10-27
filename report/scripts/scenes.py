@@ -10,7 +10,6 @@ Writes report/bundle/:
   data/example-building.json class probabilities of one correctly rated destroyed house
   scenes/<scene>.json       compact outlines per explorer scene (fetched by the website when selected)
   images/                   scene crops, overlays, 448 px example tiles, architecture parts, card cover
-  media/scene-explorer.gif  before/after → buildings found → damage, for the README
 Scene choices follow fixed rules (no hand-picking), so failure cases are included.
 """
 
@@ -28,8 +27,6 @@ from paths import (
     DATA,
     DATASETS,
     IMAGES,
-    MEDIA,
-    NAMES,
     ROOT,
     SCENES,
     TEST_EXPORT,
@@ -37,7 +34,7 @@ from paths import (
     TEST_MANIFEST,
     write_json,
 )
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from shapely import wkt
 from shapely.geometry import Polygon
 
@@ -279,7 +276,6 @@ def main_scene_parts(data: dict) -> None:
         left = (height - panel) // 2
         cover.paste(scaled.crop((left, 0, left + panel, height)), (x, 0))
     save(cover, "cover.jpg")
-    animation(data, pre, post)
 
 
 def example_building() -> list[float]:
@@ -317,67 +313,8 @@ def dataset_numbers() -> dict:
 
 # --- README animation ----------------------------------------------------------------------------------------------
 
-def _font(size: int) -> ImageFont.ImageFont:
-    for name in ("/System/Library/Fonts/SFNSMono.ttf", "/System/Library/Fonts/Menlo.ttc",
-                 "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"):
-        try:
-            return ImageFont.truetype(name, size)
-        except OSError:
-            continue
-    return ImageFont.load_default()
-
-
-def _caption(frame: Image.Image, step: str, text: str, legend: list[tuple[str, str]] | None = None) -> Image.Image:
-    width, height = frame.size
-    canvas = Image.new("RGBA", (width, height + 78), (16, 44, 54, 255))
-    canvas.paste(frame, (0, 0))
-    draw = ImageDraw.Draw(canvas)
-    draw.text((16, height + 12), step, font=_font(11), fill=(169, 211, 182, 255))
-    draw.text((16, height + 30), text, font=_font(14), fill=(237, 244, 239, 255))
-    x = 16
-    for label, color in legend or []:
-        draw.rectangle((x, height + 57, x + 10, height + 67), fill=_hex(color, 255))
-        draw.text((x + 16, height + 55), label, font=_font(11), fill=(205, 218, 214, 255))
-        x += 26 + int(draw.textlength(label, font=_font(11))) + 10
-    return canvas.convert("RGB")
-
-
-def animation(data: dict, pre: Image.Image, post: Image.Image, size: int = 520) -> None:
-    """Before/after swipe → buildings found → damage, as a GIF whose palette reserves the exact class colours."""
-    pre, post = pre.resize((size, size), Image.LANCZOS), post.resize((size, size), Image.LANCZOS)
-    scale = size / data["size"]
-    frames, durations = [], []
-    frames.append(_caption(pre, "1 / 3  ·  BEFORE / AFTER", "Before the fire")); durations.append(1300)
-    for step in range(1, 9):
-        x = int(size * step / 8)
-        frame = pre.copy()
-        frame.paste(post.crop((0, 0, x, size)), (0, 0))
-        ImageDraw.Draw(frame).line([(x, 0), (x, size)], fill=(255, 255, 255), width=2)
-        frames.append(_caption(frame, "1 / 3  ·  BEFORE / AFTER", "After the fire")); durations.append(90)
-    frames.append(_caption(post, "1 / 3  ·  BEFORE / AFTER", "After the fire")); durations.append(1300)
-    found = overlay(post, data["detections"], lambda _: COLORS["building"], scale=scale, fill=40)
-    frames.append(_caption(found, "2 / 3  ·  BUILDINGS FOUND", f"{len(data['detections'])} buildings detected"))
-    durations.append(1800)
-    damaged = overlay(post, data["detections"], lambda d: COLORS[d["label"]], scale=scale)
-    frames.append(_caption(damaged, "3 / 3  ·  DAMAGE", "Predicted damage per building",
-                           [(NAMES[k], COLORS[k]) for k in CLASSES]))
-    durations.append(3400)
-    reserved = [_hex(c, 255)[:3] for c in COLORS.values()] + [(16, 44, 54), (237, 244, 239), (169, 211, 182),
-                                                             (205, 218, 214), (255, 255, 255)]
-    mosaic = Image.new("RGB", (size, len(frames) * (frames[0].height // 4)))
-    for i, frame in enumerate(frames):
-        mosaic.paste(frame.resize((size, frame.height // 4)), (0, i * (frame.height // 4)))
-    imagery = mosaic.quantize(colors=256 - len(reserved), method=Image.MEDIANCUT).getpalette()[:3 * (256 - len(reserved))]
-    palette = Image.new("P", (1, 1))
-    palette.putpalette(imagery + [channel for color in reserved for channel in color])
-    quantized = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
-    MEDIA.mkdir(parents=True, exist_ok=True)
-    quantized[0].save(MEDIA / "scene-explorer.gif", save_all=True, append_images=quantized[1:], duration=durations,
-                      loop=0, optimize=True)
-
-
 def main() -> None:
-    for folder in (IMAGES, SCENES, MEDIA, DATA):
+    for folder in (IMAGES, SCENES, DATA):
         folder.mkdir(parents=True, exist_ok=True)
     main_data = scene_data(MAIN_SCENE, MAIN_CROP)
     write_json(DATA / "explorer.json", main_data)
@@ -387,7 +324,7 @@ def main() -> None:
     write_json(DATA / "examples.json", examples(centres, kind, event))
     write_json(DATA / "dataset.json", dataset_numbers())
     write_json(DATA / "example-building.json", example_building())
-    print(f"scenes: {len(list(SCENES.iterdir()))} explorer scenes, {len(list(IMAGES.iterdir()))} images, GIF; "
+    print(f"scenes: {len(list(SCENES.iterdir()))} explorer scenes, {len(list(IMAGES.iterdir()))} images; "
           f"source {ROOT.name}")
 
 

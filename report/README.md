@@ -1,28 +1,27 @@
 # Report pipeline
 
 One pipeline produces everything the README and the website show: numbers, scene imagery, outlines and figures.
-Its output, the **bundle** in `report/bundle/`, is committed. The README figures in `assets/` are rendered from the
-bundle, and the website copies the bundle (pinned to a commit of this repository) and draws its own interactive
-components from it.
+Its output, the **bundle** in `report/bundle/`, is committed. The website copies the bundle (pinned to a commit of
+this repository) and draws the report's figures and interactive components from it. The README figures in `assets/`
+are captured from that website page, so both show the same figures.
 
 ```
 report/
   scripts/   build steps (Python), run from the repository root
-  figures/   README figure templates (HTML/CSS) and render.mjs
+  figures/   render.mjs (captures the README figures from the website report) and gif.py
   bundle/    generated output, committed
     site.json        all numbers and outlines the website report reads
     manifest.json    every file's SHA-256 and size, the source commit, build time, schema version
     data/            intermediate numbers (metrics, recall, flow, probes, change statistics, scene lists)
     images/          scene crops, overlays, 448 px example tiles, architecture parts, feature maps, card cover
     scenes/          compact building outlines per explorer scene
-    media/           scene-explorer.gif for the README
 ```
 
 ## Rebuilding
 
 ```bash
 uv run --group notebook python report/scripts/build.py   # metrics + scenes → data, images, scenes, site.json, manifest
-node report/figures/render.mjs                           # README figures → assets/ (needs local Google Chrome)
+node report/figures/render.mjs --url <report page>      # README figures and GIF → assets/ (local Google Chrome)
 ```
 
 Optional steps, only when their inputs change:
@@ -52,5 +51,6 @@ buildings, cropped to their densest window.
 - `site.json` has a `schema_version`. Consumers (the website components) should check it and fail loudly on a version
   they do not know.
 - Imagery contains xBD data (CC BY-NC-SA 4.0); keep the attribution with any copy.
-- After rebuilding, commit the bundle and the README figures together, so a commit always pairs code, numbers and
-  images. The manifest's `source_commit` is the commit the bundle was built from.
+- Order after a change: rebuild and commit the bundle here; sync it into the website (`npm run sync-project --
+  disaster-lens --ref <commit>`); run the website (`npm run dev`, default URL http://localhost:4321/projects/disaster-lens/)
+  and capture the README figures with `render.mjs`; commit them here. The manifest's `source_commit` is the commit the bundle was built from.

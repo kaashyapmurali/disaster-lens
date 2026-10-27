@@ -1,8 +1,8 @@
 {
  "schema_version": 1,
  "project": "disaster-lens",
- "built_at": "2026-10-27T16:36:33+00:00",
- "source_commit": "e5d88753c476a5fa6fc54ffd8214e283f0209163",
+ "built_at": "2026-10-27T16:59:23+00:00",
+ "source_commit": "eeab02b893295dca9aa48c339616de08e39e30ee",
  "source_dirty": true,
  "note": "source_commit is the commit the bundle was built from; commit the bundle itself afterwards.",
  "files": {
@@ -277,10 +277,6 @@
   "images/scene-socal-fire_00000937-pre.jpg": {
    "sha256": "6ffa634de33804779f107112b4b24ba4f8b44ce9af013f75196a135d3762040a",
    "bytes": 147309
-  },
-  "media/scene-explorer.gif": {
-   "sha256": "459e77b33cb17dde25c78da25812d69cb5a1b7bf01d85c9d881391571133191c",
-   "bytes": 543287
   },
   "scenes/hurricane-harvey_00000476.json": {
    "sha256": "89c8c033b3c2a42ddfba0fa2fcdc89388391ec1d2d4fcf5569db05e8850d90ba",

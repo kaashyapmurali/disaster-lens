@@ -1,63 +1,74 @@
 # DisasterLens
 
-Building damage assessment from satellite images taken before and after a disaster. For every building, the model
-predicts one of the four xBD damage classes: **no damage, minor damage, major damage, destroyed**.
+DisasterLens assigns one of the four xBD damage classes to every building in a pair of satellite images taken before
+and after a disaster: no damage, minor damage, major damage or destroyed.
 
-<p align="center"><img src="assets/scene-explorer.gif" width="520" alt="A wildfire scene: the after image slides over the before image, the detector outlines 72 buildings, then each outline is coloured by its predicted damage class."></p>
+<p align="center"><img src="assets/scene-explorer.gif" width="520" alt="A wildfire scene: the after image slides over the before image, the detector outlines the buildings, then each outline is coloured by its predicted damage class."></p>
 
-Recall per damage class on the xBD test split (53,850 labeled buildings): the share of buildings of each class that
-receive that class.
+**Recall per damage class · xBD test split · 53,850 buildings**
 
 | Footprints | No damage | Minor | Major | Destroyed |
 | --- | ---: | ---: | ---: | ---: |
-| Known (pre-event building outlines given) | 97.3% | 61.4% | 72.7% | 84.1% |
-| Detected (Mask R-CNN, then the same damage model) | 63.8% | 42.6% | 60.0% | 64.9% |
+| **Known footprints** (pre-event building outlines given) | 97.3% | 61.4% | 72.7% | 84.1% |
+| **Detected footprints** (Mask R-CNN, then the same damage model) | 63.8% | 42.6% | 60.0% | 64.9% |
 
-The difference between the two rows comes mostly from buildings the detector misses: among buildings it finds, recall
-is 97% / 59% / 75% / 86%. All model choices were made on a validation split; the test split was scored once.
+Recall for a class: the share of buildings with that reference label that receive it. Same damage model in both rows;
+only the source of the footprints differs.
 
-## 1. Task
+The difference between the two rows comes mostly from buildings the detector misses: among the buildings it finds,
+recall per class is 97% / 59% / 75% / 86%. All model choices were made on a validation split; the test split was
+scored once.
+
+## Task
 
 After a hurricane, flood or wildfire, responders need to know which buildings are damaged. Satellites image the area
 before and after the event. The task here is to assign one damage class to each building from the two images, either
 with known building footprints or by detecting the buildings first.
 
-## 2. Data
+## Data
 
-<p align="center"><img src="assets/data.jpg" width="100%" alt="Pre- and post-event pairs for wildfire, flood, hurricane wind, tsunami, earthquake and volcano; class shares and split sizes."></p>
+[xBD](https://xview2.org/dataset) ([Gupta et al., 2019](https://arxiv.org/abs/1911.09296)) provides pre- and
+post-event satellite images (1024 × 1024 px) with building outlines and a damage label per building. Its train and
+test splits, used here, cover ten disasters. 73% of labeled buildings are undamaged, so results are reported as recall
+per class rather than overall accuracy.
 
-[xBD](https://xview2.org/dataset) provides pre- and post-event satellite images (1024 × 1024 px) with building
-outlines and a damage label per building. Its train and test splits, used here, cover ten disasters. 73% of labeled
-buildings are undamaged, so results are reported as recall per class rather than overall accuracy.
+<p align="center"><img src="assets/data.jpg" width="100%" alt="Before and after pairs for wildfire, flood, hurricane wind, tsunami, earthquake and volcano; class balance of train + validation and test; split sizes."></p>
 
-## 3. Model
-
-<p align="center"><img src="assets/architecture.jpg" width="100%" alt="Two stages. A: Mask R-CNN on the pre-event image finds building footprints (or known footprints are used). B: when the post-disaster image arrives, one DINOv3 ViT-L encodes both dates; per-date patch embeddings and scene contexts are pooled per footprint and a small head classifies damage."></p>
+## Model
 
 Two stages, run at different times.
 
-**A. Building identification (pre-event image).** Mask R-CNN with a ResNet-50-FPN backbone, starting from COCO
-weights: ResNet-50 → feature pyramid → region proposals → RoIAlign → box head (building vs. background) and mask head
-(28 × 28 mask per building). The ResNet stem and first stage stay frozen; stages 2–4, the pyramid, the proposal network
-and both heads are fine-tuned on xBD footprints, with new two-class predictors. The training loss is the standard Mask
-R-CNN sum, with equal weights: proposal objectness (binary cross-entropy) and box offsets (smooth L1), building vs.
-background (cross-entropy) and box refinement (smooth L1), and the per-pixel mask loss (binary cross-entropy). Two
-thirds of all buildings cover less than 32 × 32 px, so the detector is trained and run on 512 px tiles enlarged 2×; on
-validation this raised mask AP from 0.343 to 0.405 and small-building recall from 44% to 58%. With an existing
+<p align="center"><img src="assets/architecture.jpg" width="100%" alt="A: Mask R-CNN on the pre-event image finds building footprints (or known footprints are used). B: when the post-disaster image arrives, one DINOv3 ViT-L encodes both dates; per-footprint features and scene contexts are compared and a small classifier predicts damage."></p>
+
+### Building identification
+
+[Mask R-CNN](https://arxiv.org/abs/1703.06870) with a ResNet-50-FPN backbone, starting from COCO weights: ResNet-50 →
+feature pyramid → region proposals → RoIAlign → box head (building vs. background) and mask head (28 × 28 mask per
+building). The ResNet stem and first stage stay frozen; stages 2–4, the pyramid, the proposal network and both heads
+are fine-tuned on xBD footprints, with new two-class predictors. The training loss is the standard Mask R-CNN sum,
+with equal weights: proposal objectness (binary cross-entropy) and box offsets (smooth L1), building vs. background
+(cross-entropy) and box refinement (smooth L1), and the per-pixel mask loss (binary cross-entropy).
+
+Two thirds of all buildings cover less than 32 × 32 px, so the detector is trained and run on 512 px tiles enlarged
+2×. On validation this raised mask AP from 0.343 to 0.405 and small-building recall from 44% to 58%. With an existing
 building map, this stage is skipped.
 
-**B. Damage assessment (when the post-disaster image arrives).**
-- Both dates are encoded by one DINOv3 ViT-L/16, pretrained on satellite imagery (SAT-493M): 16 × 16 px patches →
-  24 transformer blocks (1024-d, 16 heads, rotary positions) → a 64 × 64 grid of 1024-d patch embeddings per date.
-  Blocks 1–20 stay frozen; blocks 21–24 and the final norm (50M of 303M parameters) are fine-tuned.
+### Damage assessment
+
+- Both dates are encoded by one [DINOv3](https://github.com/facebookresearch/dinov3) ViT-L/16, pretrained on
+  satellite imagery (SAT-493M): 16 × 16 px patches → 24 transformer blocks → a 64 × 64 grid of 1024-d patch
+  embeddings per date. Blocks 1–20 stay frozen; blocks 21–24 and the final norm (50M of 303M parameters) are
+  fine-tuned.
 - A scene context is kept per date: the mean of all patch embeddings of the pre- and of the post-event image.
-- For each footprint, RoIAlign pools a 3 × 3 grid of patch embeddings on both dates. With the two scene contexts, each
-  building has four raw vectors: pre building, post building, pre context, post context.
+- For each footprint, RoIAlign pools a 3 × 3 grid of patch embeddings on both dates. With the two scene contexts,
+  each building has four raw vectors: pre building, post building, pre context, post context.
 - Each is projected to 128-d, and a small MLP (512 → 128 → 4) classifies
   **[post building, post context, Δ building, Δ context]**, where Δ = post − pre. The pre-event features enter only
   through the two Δ terms. The loss is cross-entropy over the four damage classes, unweighted.
 
-Damage models tried, with known footprints on the test split:
+### Damage models tried
+
+Recall per class with known footprints, test split:
 
 | Damage model | No damage | Minor | Major | Destroyed |
 | --- | ---: | ---: | ---: | ---: |
@@ -67,26 +78,39 @@ Damage models tried, with known footprints on the test split:
 | **Fine-tuned DINOv3 ViT-L** (selected) | **97.3%** | **61.4%** | **72.7%** | **84.1%** |
 
 The post-image-only baseline reaches its minor-damage recall by labeling 14% of undamaged buildings as damaged.
-Among the models that keep no-damage recall above 96%, the fine-tuned ViT has the highest minor-damage recall. Models
-were selected on validation macro-F1 (the mean of the per-class F1 scores).
+Among the models that keep no-damage recall above 96%, the fine-tuned ViT has the highest minor-damage recall.
+Models were selected on validation macro-F1 (the mean of the per-class F1 scores).
 
-## 4. Results
+## Results
 
-<p align="center"><img src="assets/recall.png" width="100%" alt="Per-class recall with known footprints and with detected footprints, and for each class the share of buildings found and correctly classified, found but misclassified, and missed."></p>
+### Per-class recall
 
-- With known footprints, recall is 97% for no damage, 61% for minor, 73% for major and 84% for destroyed.
-- With detected footprints, most of the loss comes from missed buildings. The detector finds 66% of undamaged and
-  72–80% of damaged buildings; among the buildings it finds, recall per class is close to the known-footprint values.
-- Minor damage is the hardest class: 28% of minor-damage buildings are predicted as undamaged.
-- Precision with known footprints, for reference: no damage 95%, minor 72%, major 76%, destroyed 84%.
+With known footprints, recall is 97% for no damage, 61% for minor, 73% for major and 84% for destroyed. With detected
+footprints, most of the loss comes from missed buildings: the detector finds 66% of undamaged and 72–80% of damaged
+buildings, and among the buildings it finds, recall per class is close to the known-footprint values.
 
-<p align="center"><img src="assets/results.png" width="100%" alt="A flow of the 53,850 test buildings into found and missed, and found into exact class, one class off, further off; a confusion grid with known footprints; detector metrics."></p>
+<p align="center"><img src="assets/recall.png" width="100%" alt="For each class, the share of buildings found and rightly classified, found but misclassified, and missed by the detector, with the known-footprint recall marked."></p>
 
-<p align="center"><img src="assets/examples.jpg" width="100%" alt="Five test tiles (wildfire, flood, hurricane wind, tsunami, earthquake) with before, after, predicted and reference damage."></p>
+### Where buildings are lost
 
-## 5. Sensitivity analysis
+<p align="center"><img src="assets/flow.png" width="100%" alt="53,850 labeled test buildings split into 36,604 found and 17,246 missed; found buildings split into exact damage class, one class off and two or more classes off; 15,474 extra detections."></p>
 
-<p align="center"><img src="assets/change.jpg" width="100%" alt="Panel 1: with the pre-event image given twice, predicted damage nearly disappears. Panel 2: predicted severity against simple image-change statistics by disaster. Panel 3: Δ features, the change in encoder features between dates on the wildfire scene."></p>
+### Class confusion and detection
+
+Minor damage is the hardest class: 28% of minor-damage buildings are predicted as undamaged.
+
+<p align="center"><img src="assets/confusion.png" width="100%" alt="Confusion matrix with known footprints on the test split, and detector metrics: mask AP 0.406, 68% of buildings found, precision 0.70, 57% of small buildings found."></p>
+
+### Examples
+
+<p align="center"><img src="assets/examples.jpg" width="100%" alt="Five test crops (wildfire, flood, hurricane wind, tsunami, earthquake) with before, after, predicted and reference damage."></p>
+
+For comparison, the damage baseline in the xBD paper, which also classifies given building polygons, reports recall of
+53% / 11% / 0.5% / 43% for the four classes. The xView2 challenge winners were much stronger, but they were scored on
+a pixel-level metric ([first-place solution](https://github.com/DIUx-xView/xView2_first_place)), which is not directly
+comparable to these per-building numbers.
+
+## Sensitivity analysis
 
 - With the pre-event image given as both dates, the share of buildings predicted as damaged drops from 93.5% to 1.3%
   for destroyed, 88.9% to 0.3% for major and 72.4% to 0.4% for minor. The predictions depend on the post-event image,
@@ -98,43 +122,37 @@ were selected on validation macro-F1 (the mean of the per-class F1 scores).
   vegetation around it, in line with the labels. Flood and earthquake damage changes few roof pixels, and predicted
   severity barely moves with these measures there.
 
-These are input probes and associations, not a complete explanation of the network.
+<p align="center"><img src="assets/change.jpg" width="100%" alt="Panel 1: with the pre-event image given as both dates, predicted damage nearly disappears. Panel 2: predicted severity against image-change statistics by disaster. Panel 3: Δ features on the wildfire scene next to the predictions."></p>
 
-## 6. Next steps
+## Next steps
 
-<p align="center"><img src="assets/next-steps.jpg" width="100%" alt="Deployment pipeline with alignment to a pre-event reference as the first step; two approaches depending on available metadata; matching restricted to roads; a SIFT example on the test wildfire pair."></p>
-
-**Alignment is the first step of a deployment pipeline and the main open problem.** The damage model needs building
+Alignment is the first step of a deployment pipeline and the main open problem. The damage model needs building
 footprints that line up with the post-disaster image. In xBD, image pairs arrive aligned with their footprints; the
-dataset authors corrected post-event offsets per event. A real
-post-disaster image arrives with location metadata only, so it first has to be aligned to a pre-event reference with
-building footprints; then the reference footprints are transferred and the damage model runs on them. If no reliable
-alignment is found, the detector is the fallback, at the lower recall shown above.
+dataset authors corrected post-event offsets per event. A real post-disaster image arrives with location metadata
+only, so it first has to be aligned to a pre-event reference with building footprints. Then the reference footprints
+are transferred and the damage model runs on them. Without a reliable alignment, the detector is the fallback, at the
+lower recall shown above.
 
-The approach depends on the available metadata:
+<p align="center"><img src="assets/next-steps.jpg" width="100%" alt="Deployment pipeline with alignment to a pre-event reference as step 1; approaches with the camera pose known or only the camera position; matching restricted to non-building structure; a SIFT example on the wildfire test pair with buildings excluded."></p>
 
-1. **Camera pose known** (GPS position, altitude, orientation, lens). Project rays from the image corners to the
-   ground to get the image's ground footprint. This narrows the search to a small area and gives a first alignment;
-   fetch the pre-event reference and building footprints for that area, then refine with keypoint matching and RANSAC.
-2. **Camera position only.** The search radius is the GPS error plus the visibility range (how far the camera can see
-   from its altitude). Collect candidate reference tiles inside it, rank them with an image embedder (nearest-neighbour
-   search on global embeddings), and align the best candidates with keypoint matching and RANSAC, accepting a match
-   only if enough keypoints agree.
+The approach depends on the available metadata. With the camera pose known (GPS position, altitude, orientation,
+lens), rays projected from the image corners to the ground give the image's ground footprint, which narrows the search
+and gives a first alignment. With only a camera position, the search radius is the GPS error plus the visibility
+range; candidate reference tiles are ranked with an image embedder and aligned with keypoint matching. In both cases,
+keypoints should come from structure that is not being assessed — roads, bridges, rivers, forest and field edges —
+because buildings are what the model assesses and what the disaster changes. On the wildfire test pair, matching with
+every building masked out still finds 47 consistent matches with a median residual of 1.1 px.
 
-In both cases, keypoints should come from structure that is not being assessed: roads, bridges, rivers, forest and
-field edges. Buildings are excluded, because they are what the damage model assesses and what the disaster changes;
-the reference footprints provide the mask. On the wildfire test pair above, SIFT matching with all building footprints
-masked out (22% of the image) still finds 47 consistent matches after RANSAC, on roads and open ground, with a median
-residual of 1.1 px.
+Also next:
 
-Other next steps:
 - **Misalignment tolerance:** shift the footprints synthetically and measure how recall degrades; this sets the
   accuracy the alignment step needs.
 - **Unseen disasters:** all results come from ten events seen in training; hold out whole events.
 - **Detection fallback:** 78% of missed buildings already have a correct outline with a low confidence score; a pilot
   that re-scores detections with ViT features improved validation results.
 - **Minor damage:** pool features over the building mask instead of its box.
-- One training run per model; labels describe what is visible from above, not structural safety.
+
+One training run per model; labels describe what is visible from above, not structural safety.
 
 ## Repository layout
 
@@ -147,7 +165,7 @@ src/disaster_lens/
   end_to_end/  damage predictions on detected and annotated footprints, scoring, no-change probe
 modal_app.py   runs any stage on a Modal L4 GPU
 report/        report pipeline: scripts, figure templates and the generated bundle (numbers + imagery)
-assets/        README figures, rendered from report/bundle
+assets/        README figures, captured from the website report (drawn from report/bundle)
 tests/         CPU unit and workflow tests on synthetic data
 ```
 
@@ -255,12 +273,12 @@ python -m disaster_lens.end_to_end.run --checkpoint runs/fine-tuned-vit/best.pt 
     --export-dir runs/detector-2x/test_predictions_tile512 --output-dir runs/end-to-end-test --device cuda
 ```
 
-**Report figures.** The README figures and the website report are built from one committed bundle,
-`report/bundle/`; see [report/README.md](report/README.md):
+**Report figures.** The website report and this README are built from one committed bundle, `report/bundle/`; see
+[report/README.md](report/README.md):
 
 ```bash
 uv run --group notebook python report/scripts/build.py      # numbers, scenes, site data, manifest
-node report/figures/render.mjs                              # README figures in assets/ (local Chrome)
+node report/figures/render.mjs --url <website report URL>   # README figures and GIF in assets/ (local Chrome)
 ```
 
 ## Tests
@@ -271,12 +289,3 @@ uv run --group vit --group cloud python -m unittest discover -s tests
 
 Tests run on CPU with synthetic images and tiny models: every encoder × inputs × trainable-blocks combination,
 detector training/export/tiling, end-to-end runs and scoring, and the Modal runner (without Modal calls).
-
-## License
-
-Code: MIT (see `LICENSE`); `LICENSES/` holds third-party notices (torchvision-derived Mask R-CNN code,
-BSD-3-Clause). Data: xBD, CC BY-NC-SA 4.0, not included. The figures in `assets/` contain xBD imagery and labels and
-are shared under CC BY-NC-SA 4.0 (see `LICENSES/xBD-imagery.md`). DINOv3 weights are subject to Meta's DINOv3
-license.
-
-xBD: Gupta et al., *xBD: A Dataset for Assessing Building Damage from Satellite Imagery*, CVPR Workshops 2019.
