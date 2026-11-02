@@ -1,8 +1,8 @@
 {
  "schema_version": 1,
  "project": "disaster-lens",
- "built_at": "2026-10-27T16:59:23+00:00",
- "source_commit": "eeab02b893295dca9aa48c339616de08e39e30ee",
+ "built_at": "2026-11-02T07:23:15+00:00",
+ "source_commit": "fed615fad22625c64f493be77b81a3050f328954",
  "source_dirty": true,
  "note": "source_commit is the commit the bundle was built from; commit the bundle itself afterwards.",
  "files": {
@@ -21,6 +21,10 @@
   "data/dataset.json": {
    "sha256": "59f88fda564341eaaff2f7bea89712152d160c238e825476861d3a747df5044e",
    "bytes": 632
+  },
+  "data/drone.json": {
+   "sha256": "fc3b6626ff30628412c645d044dbbc0b64e41038e40a28d4507a3563dd0c99b2",
+   "bytes": 61561
   },
   "data/example-building.json": {
    "sha256": "5e4adb3fb77cccb7381667279f38ef056e4c3c1e803a3f115a3df9412733a54d",
@@ -165,6 +169,146 @@
   "images/data-wind-reference.jpg": {
    "sha256": "59f80208688a2c10e6cafa6457b20089281e9707ad7a59d4cb708f22506b61a0",
    "bytes": 70187
+  },
+  "images/drone-card-ian-post.jpg": {
+   "sha256": "4c30e4aa7653ee0f9031c2378f5742fa81928c57aa11fc6151c6407a619eee7c",
+   "bytes": 67853
+  },
+  "images/drone-card-ian-pre.jpg": {
+   "sha256": "94148eec4ae7ca475e010911e79b4ac450dbaca192468831029681860d8e9bab",
+   "bytes": 60798
+  },
+  "images/drone-card-mb-post.jpg": {
+   "sha256": "e29e548574e18a8894408431869f4811f07f26c655b1df807197a87fd26000b0",
+   "bytes": 88285
+  },
+  "images/drone-card-mb-pre.jpg": {
+   "sha256": "b538661085986ba70bfc5d0371d4ec5984b460f572f887c6ee6cd1069bee142b",
+   "bytes": 42649
+  },
+  "images/drone-close-0.jpg": {
+   "sha256": "87ca51fbeffd0e92dfd2cedd1872c1f502b64f8d65fb3aab98248c86aa084a8f",
+   "bytes": 35390
+  },
+  "images/drone-close-1.jpg": {
+   "sha256": "cd4cc6b43afe48913492c0b5d141dbd74eec371e5fdbaf0266de5032b7cda45e",
+   "bytes": 31755
+  },
+  "images/drone-close-2.jpg": {
+   "sha256": "32b4f06bfdc3ae91487e56b1ce1435cca0ddd1226ae6c76ee4b625b024211441",
+   "bytes": 38179
+  },
+  "images/drone-close-3.jpg": {
+   "sha256": "38ca57729108954586ae282f31a4f9d542448450a88c4d3b2a4a91b397823982",
+   "bytes": 32017
+  },
+  "images/drone-ex-destroyed-fixed-drone.jpg": {
+   "sha256": "83c296971ab4e8d40334da0731bfada1022b621d00a8bb9b8c684e48ab09f4ae",
+   "bytes": 28880
+  },
+  "images/drone-ex-destroyed-fixed-post.jpg": {
+   "sha256": "826738e3698162c589eb98955287d415e8c993669ba82db794ca81717aa80011",
+   "bytes": 10093
+  },
+  "images/drone-ex-destroyed-fixed-pre.jpg": {
+   "sha256": "8fc21c7e2e717c60e580576c74f6fd9ad7fc69e95d79fe1179d6ecf4bd22bd75",
+   "bytes": 10256
+  },
+  "images/drone-ex-destroyed-still-drone.jpg": {
+   "sha256": "9b373b2dea68ed489ff521ddd6b65ce5ac668d19fea44c0ddbd3f2632def9aac",
+   "bytes": 27353
+  },
+  "images/drone-ex-destroyed-still-post.jpg": {
+   "sha256": "e0a1b12a587f55f34c77bc677ad87cbd3e0e314a059aca5583fa190759780a1e",
+   "bytes": 13161
+  },
+  "images/drone-ex-destroyed-still-pre.jpg": {
+   "sha256": "55498efc028c19af9726735e7169a2deae9f67dbccce50c354f1f4e0bc866bc1",
+   "bytes": 9916
+  },
+  "images/drone-ex-major-damage-fixed-drone.jpg": {
+   "sha256": "a3fbcd7a23c29388bd86226a405f85e0e85b067eb808605e0ec26c9ef3d776f7",
+   "bytes": 30113
+  },
+  "images/drone-ex-major-damage-fixed-post.jpg": {
+   "sha256": "b23366e7a7b57784c7c1f7b4d9900fd104ac89a18ffb881d0968aaa85f13a013",
+   "bytes": 12897
+  },
+  "images/drone-ex-major-damage-fixed-pre.jpg": {
+   "sha256": "e29bac6f5ddedbe4844d6ee701f3e2fcf8d2df9225efdd73f017eb8b8acc3b8f",
+   "bytes": 12100
+  },
+  "images/drone-ex-major-damage-still-drone.jpg": {
+   "sha256": "f25e8e3c34ab7d4ceba4635e96814862631ab3b9130ce9f5fe4fba402157353d",
+   "bytes": 31530
+  },
+  "images/drone-ex-major-damage-still-post.jpg": {
+   "sha256": "394f216d031dea74a3f5c71930c60405f75043309210469267db41fed98d53c6",
+   "bytes": 12152
+  },
+  "images/drone-ex-major-damage-still-pre.jpg": {
+   "sha256": "68b58a0ff06f32476a9a07dd1ec36e6345fbe9eb63c54f39e0a6b89fc0396a23",
+   "bytes": 10214
+  },
+  "images/drone-ex-minor-damage-fixed-drone.jpg": {
+   "sha256": "fcad4ebb820a2cce64d7e292cee2104627224dcc552427261fb57521c9c6c3e0",
+   "bytes": 23198
+  },
+  "images/drone-ex-minor-damage-fixed-post.jpg": {
+   "sha256": "9c9519d370bcb2273e9ef2f9e4bb934f2614e978a754713dfe5f4e41226739b8",
+   "bytes": 11520
+  },
+  "images/drone-ex-minor-damage-fixed-pre.jpg": {
+   "sha256": "a12531a7b04d85bf12089a61cdc201ed4e0366604c2a099ec6c46eb51a4775c5",
+   "bytes": 10486
+  },
+  "images/drone-ex-minor-damage-still-drone.jpg": {
+   "sha256": "3f20916abea1c2c3a11d155a15fe8c0c70cea1e5258615564b91b9a68343f05b",
+   "bytes": 27152
+  },
+  "images/drone-ex-minor-damage-still-post.jpg": {
+   "sha256": "a8473169d0488d3f78a5ba6cdad6ca76fb0964b44625b8d6c0171be00cf14029",
+   "bytes": 11715
+  },
+  "images/drone-ex-minor-damage-still-pre.jpg": {
+   "sha256": "1d2263318581a139db7055c1d26bf7cf69bc15bf11f66d96eb6e79e4bac7e27b",
+   "bytes": 9393
+  },
+  "images/drone-ex-no-damage-fixed-drone.jpg": {
+   "sha256": "289de33c031e181c1b1d29cd8d1a432ef3a29ae6cf6f0c7351610f64c5a02471",
+   "bytes": 25311
+  },
+  "images/drone-ex-no-damage-fixed-post.jpg": {
+   "sha256": "3d863156f2c081ece88cc770b6d911eb1cc16a1855609aac67026dc6543d8a4a",
+   "bytes": 11016
+  },
+  "images/drone-ex-no-damage-fixed-pre.jpg": {
+   "sha256": "cb484f2f65718a357f6a58dc4ee6f55da10c37e8e34293bfc554228abeb4d83c",
+   "bytes": 10243
+  },
+  "images/drone-ex-no-damage-still-drone.jpg": {
+   "sha256": "91371bf8c65ebb0fa4862fc1f4f493369f27f466a4e48afe5f3b3557aa7f9d6a",
+   "bytes": 28228
+  },
+  "images/drone-ex-no-damage-still-post.jpg": {
+   "sha256": "974dc16a2015ad9f811bf039fb6c89e631676820013ccef61c99dddbc37bc0f0",
+   "bytes": 11450
+  },
+  "images/drone-ex-no-damage-still-pre.jpg": {
+   "sha256": "ef8b52117c9123b2d7cdd12d0ad4783b48f5717164c50b471cd6e4bf3110b726",
+   "bytes": 10079
+  },
+  "images/drone-explorer-post.jpg": {
+   "sha256": "761ef465f36057478626004543128eeb5996390617e038d276a6551409a18922",
+   "bytes": 327006
+  },
+  "images/drone-explorer-pre.jpg": {
+   "sha256": "c3f9f984fef497b02f949ec3c734767a1d2dd1c7bd33cb4ed28005ead0d54c6b",
+   "bytes": 161620
+  },
+  "images/drone-matches.jpg": {
+   "sha256": "6a0864c2711bc51f49069f98c82bb04905e7a48b92b1b110fd12cf0e6e63cdc5",
+   "bytes": 287949
   },
   "images/explorer-damage.jpg": {
    "sha256": "dca4700819f9eeb59aff30c6b155cee1ebc1795f6c653e9d5bb4b620f2fcf539",
@@ -323,8 +467,8 @@
    "bytes": 21064
   },
   "site.json": {
-   "sha256": "eadf2e8d6790bcc629e53abdb487462abc6a90d81d9fdd1b66cdb508e4a3d9cd",
-   "bytes": 49213
+   "sha256": "f98cc4e18cc7719027c5085943c3c24e876a19493ef69242054f5cfadd47aa55",
+   "bytes": 75794
   }
  }
 }
