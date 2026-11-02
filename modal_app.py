@@ -86,21 +86,26 @@ def damage_head_stages(run_name: str, cache: str, epochs: int = 5) -> list[list[
 
 
 def damage_live_stages(run_name: str, encoder: str, inputs: str, trainable_blocks: int, *, init_head: str = "",
-                       epochs: int = 5, precision: str = "float32", backbone_lr: float = 1e-5,
-                       head_lr: float = 1e-4) -> list[list[str]]:
-    """Train any encoder × inputs × trainable-blocks classifier on live images, then export validation predictions."""
+                       init_model: str = "", split: str = "seed42", epochs: int = 5, precision: str = "float32",
+                       backbone_lr: float = 1e-5, head_lr: float = 1e-4) -> list[list[str]]:
+    """Train any encoder × inputs × trainable-blocks classifier on live images, then export validation predictions.
+
+    `split` names a folder under processed/splits (train.csv, validation.csv); `init_model` starts from a previous
+    run's best checkpoint (all weights), e.g. to adapt the reported model to drone imagery."""
     validate_name(run_name)
-    output = RUNS / run_name
+    output, splits = RUNS / run_name, DATA / "processed/splits" / validate_name(split)
     extra = ["--encoder-dir", str(DINOV3)] if encoder == "dinov3-vitl" else []
     if init_head:
         extra += ["--init-head", str(RUNS / validate_name(init_head) / "best.pt")]
+    if init_model:
+        extra += ["--init-model", str(RUNS / validate_name(init_model) / "best.pt")]
     return [module("damage.train_live", "train", "--encoder", encoder, "--inputs", inputs, "--trainable-blocks",
-                   str(trainable_blocks), *extra, "--data-dir", str(DATA), "--split-dir", str(SPLITS), "--output-dir",
+                   str(trainable_blocks), *extra, "--data-dir", str(DATA), "--split-dir", str(splits), "--output-dir",
                    str(output), "--epochs", str(epochs), "--batch-size", "1", "--validation-batch-size", "1",
                    "--backbone-lr", repr(backbone_lr), "--head-lr", repr(head_lr), "--weight-decay", "0.0001",
                    "--precision", precision, "--num-workers", "2", "--seed", "42", "--device", "cuda"),
             module("damage.train_live", "export", "--run-dir", str(output), "--data-dir", str(DATA), "--manifest",
-                   str(SPLITS / "validation.csv"), "--num-workers", "2", "--device", "cuda")]
+                   str(splits / "validation.csv"), "--num-workers", "2", "--device", "cuda")]
 
 
 DETECTOR_RECIPE = ["--data-dir", str(DATA), "--index-dir", str(INDEX), "--batch-size", "1", "--validation-batch-size", "1",
@@ -301,10 +306,12 @@ def damage_head(run_name: str, cache: str, epochs: int = 5, work_seconds: int = 
 
 @app.local_entrypoint()
 def damage_live(run_name: str, encoder: str, inputs: str, trainable_blocks: int = 0, init_head: str = "",
-                epochs: int = 5, precision: str = "float32", backbone_lr: float = 1e-5, head_lr: float = 1e-4,
-                work_seconds: int = 21000, confirm_run: bool = False) -> None:
-    stages = damage_live_stages(run_name, encoder, inputs, trainable_blocks, init_head=init_head, epochs=epochs,
-                                precision=precision, backbone_lr=backbone_lr, head_lr=head_lr)
+                init_model: str = "", split: str = "seed42", epochs: int = 5, precision: str = "float32",
+                backbone_lr: float = 1e-5, head_lr: float = 1e-4, work_seconds: int = 21000,
+                confirm_run: bool = False) -> None:
+    stages = damage_live_stages(run_name, encoder, inputs, trainable_blocks, init_head=init_head, init_model=init_model,
+                                split=split, epochs=epochs, precision=precision, backbone_lr=backbone_lr,
+                                head_lr=head_lr)
     submit(run_name, stages, work_seconds, confirm_run)
 
 

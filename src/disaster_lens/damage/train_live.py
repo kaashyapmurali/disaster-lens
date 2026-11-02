@@ -185,11 +185,23 @@ def run_live_epoch(model: DamageClassifier, loader: DataLoader, device: torch.de
     }, rows
 
 
+def _load_init_model(model: DamageClassifier, path: Path, encoder: str) -> dict:
+    """Start from a saved live classifier (all weights: encoder, trainable suffix and head), e.g. to adapt the reported
+    fine-tuned model to new imagery. Any difference in encoder, inputs, trainable blocks or shapes is an error."""
+    checkpoint = torch.load(path, map_location="cpu", weights_only=True)
+    source, recipe = load_live_model(checkpoint, torch.device("cpu"))
+    if (recipe["encoder"], source.inputs, source.trainable_blocks) != (encoder, model.inputs, model.trainable_blocks):
+        raise ValueError(f"--init-model was trained as {recipe['encoder']}/{source.inputs}/{source.trainable_blocks} blocks; "
+                         f"this run is {encoder}/{model.inputs}/{model.trainable_blocks}.")
+    model.load_state_dict(source.state_dict(), strict=True)
+    return {"head": "init-model", "init_model_sha256": _file_digest(path), "init_model_epoch": checkpoint["epoch"]}
+
+
 def train_live(
     encoder: str, inputs: str, data_dir: Path, split_dir: Path, output_dir: Path, *,
     trainable_blocks: int = 0, encoder_dir: Path | None = None, init_head: Path | None = None,
-    epochs: int = 5, batch_size: int = 1, validation_batch_size: int = 1, backbone_lr: float = 1e-5,
-    head_lr: float = 1e-4, weight_decay: float = 1e-4, image_size: int = 1024, roi_size: int = 3,
+    init_model: Path | None = None, epochs: int = 5, batch_size: int = 1, validation_batch_size: int = 1,
+    backbone_lr: float = 1e-5, head_lr: float = 1e-4, weight_decay: float = 1e-4, image_size: int = 1024, roi_size: int = 3,
     num_workers: int = 0, seed: int = 42, device: torch.device = torch.device("cpu"), precision: str = "float32",
     smoke_test: bool = False, backbone: torch.nn.Module | None = None,
 ) -> list[dict]:
@@ -208,6 +220,8 @@ def train_live(
         raise ValueError("Invalid learning rates, weight decay, or seed.")
     if init_head is not None and inputs != "paired":
         raise ValueError("--init-head applies to the paired fusion head only.")
+    if init_head is not None and init_model is not None:
+        raise ValueError("Use either --init-head or --init-model, not both.")
     _validate_precision(precision, device)
     train, validation = (_dataset(split_dir / f"{split}.csv", data_dir, image_size, encoder) for split in ("train", "validation"))
     _validate_splits(train, validation)
@@ -223,6 +237,8 @@ def train_live(
     if head_state is not None:
         head.load_state_dict(head_state, strict=True)
     model = DamageClassifier(backbone, head, inputs=inputs, trainable_blocks=trainable_blocks, roi_size=roi_size)
+    if init_model is not None:
+        initialization = _load_init_model(model, init_model, encoder)
     if smoke_test:
         if epochs != 1 or batch_size != 1 or validation_batch_size != 1:
             raise ValueError("Smoke runs use one epoch and one scene per batch.")
@@ -416,6 +432,7 @@ def main() -> None:
     train.add_argument("--trainable-blocks", type=int, default=0, help="0 = frozen encoder; N = train the last N blocks.")
     train.add_argument("--encoder-dir", type=Path, help="Local DINOv3 timm checkpoint directory (dinov3-vitl).")
     train.add_argument("--init-head", type=Path, help="Cached-feature fusion head to start from (paired only).")
+    train.add_argument("--init-model", type=Path, help="Saved live classifier to start from (all weights; same setup).")
     train.add_argument("--data-dir", type=Path, required=True)
     train.add_argument("--split-dir", type=Path, required=True)
     train.add_argument("--output-dir", type=Path, required=True)

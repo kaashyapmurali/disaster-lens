@@ -16,6 +16,8 @@ from torchvision.transforms import functional as TF
 from disaster_lens.data.manifest import DAMAGE_LABELS
 
 CLASS_TO_INDEX = {label: index for index, label in enumerate(DAMAGE_LABELS)}
+# xBD splits, plus CRASAR-U-DROIDs drone/satellite pairs exported to the same manifest format (phase B).
+SOURCE_SPLITS = ("train", "test", "crasar")
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
@@ -61,11 +63,11 @@ class SceneDataset(Dataset[SceneSample]):
         with manifest.open(newline="", encoding="utf-8") as stream:
             for row in csv.DictReader(stream):
                 if (
-                    row["source_split"] not in ("train", "test")
+                    row["source_split"] not in SOURCE_SPLITS
                     or row["match_status"] != "matched"
                     or row["damage_label"] not in CLASS_TO_INDEX
                 ):
-                    raise ValueError("Expected matched, known-label xBD train/test examples.")
+                    raise ValueError(f"Expected matched, known-label examples from {SOURCE_SPLITS}.")
                 scene_id, uid = row["scene_id"], row["building_uid"]
                 if (scene_id, uid) in seen:
                     raise ValueError(f"Duplicate building: {scene_id}/{uid}")

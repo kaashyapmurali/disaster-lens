@@ -220,6 +220,40 @@ class LiveTrainingTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             self.train("dinov3-vitl", "paired", 1, output)
 
+    def test_init_model_starts_from_every_saved_weight_and_rejects_a_different_setup(self):
+        write_split_files(self.root)
+        source = self.root / "source"
+        self.train("dinov3-vitl", "paired", 1, source, epochs=2)
+        saved = torch.load(source / "best.pt", weights_only=True)
+        output = self.root / "adapted"   # fresh random backbone; tiny learning rates keep the loaded weights
+        self.train("dinov3-vitl", "paired", 1, output, init_model=source / "best.pt", backbone_lr=1e-12, head_lr=1e-12)
+        adapted = torch.load(output / "last.pt", weights_only=True)
+        self.assertEqual(adapted["config"]["initialization"]["init_model_epoch"], saved["epoch"])
+        for name, value in saved["model_state_dict"].items():
+            torch.testing.assert_close(adapted["model_state_dict"][name], value, rtol=0, atol=1e-6)
+        with self.assertRaises(ValueError):   # trained with one block, requested with none
+            self.train("dinov3-vitl", "paired", 0, self.root / "mismatch", init_model=source / "best.pt")
+        with self.assertRaises(ValueError):
+            self.train("dinov3-vitl", "paired", 1, self.root / "both", init_model=source / "best.pt",
+                       init_head=source / "best.pt")
+
+    def test_crasar_rows_are_accepted_and_unknown_sources_rejected(self):
+        write_split_files(self.root)
+        for source, ok in (("crasar", True), ("elsewhere", False)):
+            manifest = self.root / f"{source}.csv"
+            with (self.root / "train.csv").open(newline="") as stream:
+                rows = list(csv.DictReader(stream))
+            for row in rows:
+                row["source_split"] = source
+            with manifest.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=FIELDS); writer.writeheader(); writer.writerows(rows)
+            with self.subTest(source=source):
+                if ok:
+                    self.assertEqual(len(PairedSceneDataset(manifest, self.root, image_size=64).scenes) > 0, True)
+                else:
+                    with self.assertRaises(ValueError):
+                        PairedSceneDataset(manifest, self.root, image_size=64)
+
     def test_cached_head_must_match_the_live_feature_recipe(self):
         data = write_split_files(self.root)
         backbone = tiny_vit()
