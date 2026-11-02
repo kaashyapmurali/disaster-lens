@@ -27,6 +27,12 @@ requires = ["uv_build>=0.12.24,<0.13.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
+# Drone imagery (phase two): GeoTIFF IO, matching, fitting. `uv run --group drone ...`
+drone = [
+    "opencv-python-headless>=4.12",
+    "rasterio>=1.4.3",
+    "scipy>=1.16",
+]
 cloud = [
     "modal>=1.6.2",
 ]

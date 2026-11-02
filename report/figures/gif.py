@@ -27,7 +27,7 @@ def main(frames_dir: Path, output: Path) -> None:
     palette = mosaic.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     quantized = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
     quantized[0].save(output, save_all=True, append_images=quantized[1:], duration=durations, loop=0, optimize=True)
-    print(f"scene-explorer.gif: {len(frames)} frames, {WIDTH}x{height}, {output.stat().st_size / 1e6:.1f} MB")
+    print(f"{output.name}: {len(frames)} frames, {WIDTH}x{height}, {output.stat().st_size / 1e6:.1f} MB")
 
 
 if __name__ == "__main__":

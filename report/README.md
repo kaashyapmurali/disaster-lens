@@ -27,6 +27,7 @@ node report/figures/render.mjs --url <report page>      # README figures and GIF
 Optional steps, only when their inputs change:
 
 ```bash
+uv run --group drone python report/scripts/build.py --drone                     # drone section (CRASAR, local data)
 uv run --group notebook --group vit python report/scripts/build.py --features   # DINOv3 feature images (heavy)
 uv run --group notebook python report/scripts/build.py --registration           # keypoint example (OpenCV via uvx)
 ```
@@ -40,6 +41,7 @@ The steps read model outputs and imagery that are not committed (size and licens
 | `metrics.py` | end-to-end runs for the four damage models and the no-change probe (`outputs/modal/test-e2e-*`, `outputs/local/test/*`), detector exports and error analyses (`outputs/modal/segmenter-*`, `outputs/analysis/instance-errors-*`), training results (`outputs/modal/*.result.json`); validation imagery for the change statistics (cached per building in `outputs/analysis/report/`) |
 | `scenes.py` | the test-split detector export and fine-tuned ViT predictions; xBD test images and labels (`datasets/raw/test/`); building manifests (`datasets/processed/`) |
 | `features.py` | the local DINOv3 weights (`datasets/pretrained/`), PyTorch |
+| `drone.py` | CRASAR-U-DROIDs imagery and annotations (`datasets/raw/drone/`), drone alignment and damage runs (`outputs/drone/`; see `drone/README.md`), xBD test predictions of both damage models |
 | `registration.py` | xBD test images and labels; OpenCV through `uvx` |
 
 How those outputs are produced is described in the main README (Reproduce). Scene choices follow fixed rules in

@@ -18,6 +18,7 @@ import sys
 from paths import BUNDLE, CLASSES, DATA, ROOT, sha256, write_json
 
 SCHEMA_VERSION = 1
+UVX_PACKAGES = ("opencv-python-headless", "numpy")  # registration example
 MODEL = "Fine-tuned DINOv3 ViT-L"
 
 
@@ -58,6 +59,7 @@ def site_data() -> dict:
                      "missed": [{"points": rounded(r["points"]), "label": r["label"]} for r in explorer["references"]
                                 if not r["found"] and r["label"] != "unlabeled"]},
         "scenes": load("scenes.json"),
+        "drone": load("drone.json"),
     }
 
 
@@ -75,7 +77,7 @@ def manifest() -> dict:
 
 
 def run(script: str, *, uvx: bool = False) -> None:
-    command = (["uvx", "--quiet", "--with", "opencv-python-headless", "--with", "numpy", "python"] if uvx
+    command = (["uvx", "--quiet", *[a for pkg in UVX_PACKAGES for a in ("--with", pkg)], "python"] if uvx
                else [sys.executable])
     subprocess.run([*command, str(ROOT / "report/scripts" / script)], cwd=ROOT, check=True)
 
@@ -84,6 +86,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--features", action="store_true", help="Recompute the DINOv3 feature images (heavy).")
     parser.add_argument("--registration", action="store_true", help="Recompute the keypoint-matching example (uvx).")
+    parser.add_argument("--drone", action="store_true", help="Recompute the drone section (CRASAR; needs --group drone and local data).")
     args = parser.parse_args()
     run("metrics.py")
     run("scenes.py")
@@ -91,9 +94,12 @@ def main() -> None:
         run("features.py")
     if args.registration:
         run("registration.py", uvx=True)
-    for required in ("images/features-change.jpg", "images/matches-masked.jpg", "data/matches.json"):
+    if args.drone:
+        run("drone.py")  # needs the drone group: uv run --group drone python report/scripts/build.py --drone
+    for required in ("images/features-change.jpg", "images/matches-masked.jpg", "data/matches.json", "data/drone.json",
+                     "images/drone-explorer-pre.jpg", "images/drone-explorer-post.jpg"):
         if not (BUNDLE / required).is_file():
-            raise FileNotFoundError(f"{required} is missing; run with --features / --registration once.")
+            raise FileNotFoundError(f"{required} is missing; run with --features / --registration / --drone once.")
     write_json(BUNDLE / "site.json", site_data(), compact=True)
     result = manifest()
     write_json(BUNDLE / "manifest.json", result)

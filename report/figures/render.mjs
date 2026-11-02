@@ -15,6 +15,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const FIGURES = {
   data: ['data', 'jpeg'], architecture: ['arch', 'jpeg'], recall: ['breakdown', 'png'], flow: ['flow', 'png'],
   confusion: ['confusion', 'png'], examples: ['examples', 'jpeg'], change: ['sensitivity', 'jpeg'], 'next-steps': ['next', 'jpeg'],
+
+  'drone-data': ['drone-data', 'jpeg'], 'drone-pipeline': ['drone-pipe', 'jpeg'], 'drone-alignment': ['drone-align', 'png'],
+  'drone-closeups': ['drone-close', 'jpeg'], 'drone-damage': ['drone-damage', 'png'], 'drone-examples': ['drone-examples', 'jpeg'],
 };
 const args = process.argv.slice(2);
 const urlAt = args.indexOf('--url');
@@ -52,7 +55,7 @@ try {
   const evaluate = async expression => (await page('Runtime.evaluate', {expression, returnByValue: true, awaitPromise: true})).result.value;
   await page('Page.enable'); await page('Runtime.enable');
   await mkdir(join(root, 'assets'), {recursive: true});
-  for (const name of wanted) if (name !== 'gif' && !FIGURES[name]) throw new Error(`Unknown figure ${name}`);
+  for (const name of wanted) if (!['gif', 'drone-gif'].includes(name) && !FIGURES[name]) throw new Error(`Unknown figure ${name}`);
   await page('Emulation.setDeviceMetricsOverride', {width: 1280, height: 1000, deviceScaleFactor: 2, mobile: false});
   await page('Emulation.setEmulatedMedia', {features: [{name: 'prefers-color-scheme', value: 'light'}]});
   await page('Page.navigate', {url});
@@ -71,7 +74,7 @@ try {
   await wait(500);
   const missing = await evaluate('[...document.images].filter(i => i.getAttribute("src") && !i.naturalWidth).map(i => i.getAttribute("src"))');
   if (missing.length) throw new Error(`Images failed to load: ${missing.join(', ')}`);
-  for (const name of wanted.filter(n => n !== 'gif')) {
+  for (const name of wanted.filter(n => !['gif', 'drone-gif'].includes(n))) {
     const [selector, format] = FIGURES[name];
     const file = join(root, 'assets', `${name}.${format === 'jpeg' ? 'jpg' : 'png'}`);
     const box = await evaluate(`(() => { const r = document.querySelector('figure.dl.${selector}').getBoundingClientRect(); return {x: r.x + scrollX, y: r.y + scrollY, width: Math.ceil(r.width), height: Math.ceil(r.height)}; })()`);
@@ -109,6 +112,42 @@ try {
     const code = await new Promise(done => python.on('close', done));
     await rm(frames, {recursive: true, force: true});
     if (code !== 0) throw new Error('GIF assembly failed');
+  }
+  if (!names.length || names.includes('drone-gif')) {
+    // Drone explorer: satellite -> drone sweep, footprints at the GPS position, the animated move onto the roofs,
+    // then damage colours. Positions are drawn by the component's script, so the frames click its step buttons.
+    const frames = await mkdtemp(join(tmpdir(), 'drone-frames-'));
+    const durations = [];
+    const root_ = 'figure.drone-explorer';
+    await evaluate(`(() => {
+      const style = document.createElement('style');
+      style.textContent = '${root_} .tip, ${root_} .knob { display: none !important; }';
+      document.head.append(style);
+      document.querySelector('${root_} .stage').scrollIntoView({block: 'center'});
+      return true;
+    })()`);
+    const click = s => evaluate(`(() => { document.querySelector('${root_} [data-step-button="${s}"]').click(); return true; })()`);
+    const split = v => evaluate(`(() => { document.querySelector('${root_} .stage').style.setProperty('--split', '${v}%'); return true; })()`);
+    let n = 0;
+    const frame = async ms => {
+      const box = await evaluate(`(() => { const r = document.querySelector('${root_} .stage').getBoundingClientRect(); return {x: r.x + scrollX, y: r.y + scrollY, width: Math.floor(r.width), height: Math.floor(r.height)}; })()`);
+      const {data} = await page('Page.captureScreenshot', {format: 'png', clip: {...box, scale: 1}, captureBeyondViewport: true});
+      await writeFile(join(frames, `${String(n++).padStart(3, '0')}.png`), Buffer.from(data, 'base64'));
+      durations.push(ms);
+    };
+    await click(0); await split(0); await wait(300); await frame(1300);
+    for (let k = 1; k <= 10; k++) { await split(10 * k); await wait(60); await frame(90); }
+    await frame(1300);
+    await click(1); await wait(700); await frame(2000);
+    await click(2);
+    for (let k = 0; k < 6; k++) { await wait(130); await frame(110); }
+    await wait(500); await frame(2000);
+    await click(3); await wait(700); await frame(3600);
+    await writeFile(join(frames, 'durations.json'), JSON.stringify(durations));
+    const python = spawn('uv', ['run', '--offline', '--no-sync', 'python', join(root, 'report/figures/gif.py'), frames, join(root, 'assets/drone-explorer.gif')], {cwd: root, stdio: ['ignore', 'inherit', 'inherit']});
+    const code = await new Promise(done => python.on('close', done));
+    await rm(frames, {recursive: true, force: true});
+    if (code !== 0) throw new Error('drone GIF assembly failed');
   }
   if (errors.length) throw new Error(`JavaScript errors: ${errors.join(' | ')}`);
   await call('Browser.close');
